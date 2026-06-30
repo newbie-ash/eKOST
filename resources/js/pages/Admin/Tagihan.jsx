@@ -111,12 +111,10 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
     const [searchTerm, setSearchTerm] = useState('');
     const [viewProofUrl, setViewProofUrl] = useState(null);
 
-    // Form Inertia untuk membuat tagihan baru
     const { data, setData, post, put, delete: destroy, processing, reset, errors, clearErrors } = useForm({
         sewa_id: '',
-        bulan_tagihan: 'Juni',
-        tahun_tagihan: new Date().getFullYear().toString(),
-        jumlah_tagihan: '',
+        bulan_tagihan: new Date().toISOString().slice(0, 7),
+        jumlah_bayar: '',
     });
 
     const openAddModal = () => {
@@ -136,9 +134,9 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
             // Auto fill jumlah tagihan berdasarkan harga sewa kamar yang dipilih
             const selectedSewa = sewas.find(s => s.id.toString() === sewaId.toString());
             if (selectedSewa && selectedSewa.kamar) {
-                updated.jumlah_tagihan = selectedSewa.kamar.harga_per_bulan;
+                updated.jumlah_bayar = selectedSewa.kamar.harga;
             } else {
-                updated.jumlah_tagihan = '';
+                updated.jumlah_bayar = '';
             }
             return updated;
         });
@@ -154,7 +152,7 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
     // Update status pembayaran (Lunas / Belum Bayar)
     const handleUpdateStatus = (id, newStatus) => {
         put(`/admin/tagihan/${id}`, {
-            status_pembayaran: newStatus
+            status_lunas: newStatus === 'Lunas' ? true : false
         });
     };
 
@@ -168,18 +166,17 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
         }
     };
 
-    // Filter & Search data tagihan
     const filteredTagihans = tagihans.filter((tagihan) => {
         const query = searchTerm.toLowerCase();
         const matchesSearch = 
             (tagihan.sewa?.kamar?.nomor_kamar && tagihan.sewa.kamar.nomor_kamar.toLowerCase().includes(query)) ||
-            (tagihan.sewa?.penghuni?.nama && tagihan.sewa.penghuni.nama.toLowerCase().includes(query)) ||
-            tagihan.bulan_tagihan.toLowerCase().includes(query) ||
-            tagihan.tahun_tagihan.includes(query);
+            (tagihan.sewa?.penyewa?.user?.name && tagihan.sewa.penyewa.user.name.toLowerCase().includes(query)) ||
+            tagihan.bulan_tagihan.toLowerCase().includes(query);
 
+        const statusLabel = tagihan.status_lunas ? 'Lunas' : 'Belum Bayar';
         const matchesStatus = 
             statusFilter === 'Semua' || 
-            tagihan.status_pembayaran === statusFilter;
+            statusLabel === statusFilter;
 
         return matchesSearch && matchesStatus;
     });
@@ -275,33 +272,33 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
                                         <tr key={tagihan.id} className="hover:bg-cozy-cream-50/50 transition-colors duration-150">
                                             <td className="px-6 py-4">
                                                 <div className="text-sm font-bold text-cozy-brown-900">Kamar {tagihan.sewa?.kamar?.nomor_kamar}</div>
-                                                <div className="text-xs text-cozy-brown-400 font-medium">{tagihan.sewa?.penghuni?.nama}</div>
+                                                <div className="text-xs text-cozy-brown-400 font-medium">{tagihan.sewa?.penyewa?.user?.name}</div>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-cozy-brown-900 font-semibold">
-                                                {tagihan.bulan_tagihan} {tagihan.tahun_tagihan}
+                                                {tagihan.bulan_tagihan}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-cozy-brown-900 font-bold">
-                                                {formatRupiah(tagihan.jumlah_tagihan)}
+                                                {formatRupiah(tagihan.jumlah_bayar)}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-cozy-brown-900">
                                                 <div className="flex items-center space-x-2">
                                                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                                                        tagihan.status_pembayaran === 'Lunas' 
+                                                        tagihan.status_lunas
                                                         ? 'bg-green-50 text-green-700 border border-green-100' 
                                                         : 'bg-orange-50 text-orange-700 border border-orange-100'
                                                     }`}>
-                                                        {tagihan.status_pembayaran === 'Lunas' ? (
+                                                        {tagihan.status_lunas ? (
                                                             <CheckCircle className="w-3 h-3 mr-1.5" />
                                                         ) : (
                                                             <Clock className="w-3 h-3 mr-1.5" />
                                                         )}
-                                                        {tagihan.status_pembayaran}
+                                                        {tagihan.status_lunas ? 'Lunas' : 'Belum Bayar'}
                                                     </span>
                                                     
                                                     {/* Bukti Bayar */}
-                                                    {tagihan.bukti_bayar && (
+                                                    {tagihan.bukti_transfer && (
                                                         <button 
-                                                            onClick={() => setViewProofUrl(`/storage/${tagihan.bukti_bayar}`)}
+                                                            onClick={() => setViewProofUrl(`/storage/${tagihan.bukti_transfer}`)}
                                                             className="inline-flex items-center text-xs font-semibold text-cozy-brown-500 hover:text-cozy-brown-700 hover:bg-cozy-cream-100 px-2 py-1 rounded transition"
                                                         >
                                                             <Eye className="w-3.5 h-3.5 mr-1" />
@@ -311,7 +308,7 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-right text-sm font-medium space-x-2">
-                                                {tagihan.status_pembayaran === 'Belum Bayar' ? (
+                                                {!tagihan.status_lunas ? (
                                                     <button 
                                                         onClick={() => handleUpdateStatus(tagihan.id, 'Lunas')}
                                                         className="text-green-600 hover:bg-green-50 border border-transparent hover:border-green-200 px-2.5 py-1.5 rounded-lg text-xs font-bold transition"
@@ -356,7 +353,7 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <h4 className="text-sm font-bold text-cozy-brown-900">Kamar {tagihan.sewa?.kamar?.nomor_kamar}</h4>
-                                            <p className="text-xs text-cozy-brown-400">{tagihan.sewa?.penghuni?.nama}</p>
+                                            <p className="text-xs text-cozy-brown-400">{tagihan.sewa?.penyewa?.user?.name}</p>
                                         </div>
                                         <button 
                                             onClick={() => confirmDelete(tagihan.id)} 
@@ -369,25 +366,25 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
                                     <div className="grid grid-cols-2 gap-2 text-xs bg-cozy-cream-50 p-3 rounded-lg border border-cozy-cream-200">
                                         <div>
                                             <span className="block text-cozy-brown-400 font-medium mb-0.5">Bulan</span>
-                                            <span className="text-cozy-brown-900 font-bold">{tagihan.bulan_tagihan} {tagihan.tahun_tagihan}</span>
+                                            <span className="text-cozy-brown-900 font-bold">{tagihan.bulan_tagihan}</span>
                                         </div>
                                         <div>
                                             <span className="block text-cozy-brown-400 font-medium mb-0.5">Jumlah</span>
-                                            <span className="text-cozy-brown-900 font-extrabold">{formatRupiah(tagihan.jumlah_tagihan)}</span>
+                                            <span className="text-cozy-brown-900 font-extrabold">{formatRupiah(tagihan.jumlah_bayar)}</span>
                                         </div>
                                         <div>
                                             <span className="block text-cozy-brown-400 font-medium mb-0.5">Status</span>
                                             <span className={`inline-flex items-center font-bold ${
-                                                tagihan.status_pembayaran === 'Lunas' ? 'text-green-700' : 'text-orange-700'
+                                                tagihan.status_lunas ? 'text-green-700' : 'text-orange-700'
                                             }`}>
-                                                {tagihan.status_pembayaran}
+                                                {tagihan.status_lunas ? 'Lunas' : 'Belum Bayar'}
                                             </span>
                                         </div>
                                         <div>
                                             <span className="block text-cozy-brown-400 font-medium mb-0.5 font-bold">Bukti Transfer</span>
-                                            {tagihan.bukti_bayar ? (
+                                            {tagihan.bukti_transfer ? (
                                                 <button 
-                                                    onClick={() => setViewProofUrl(`/storage/${tagihan.bukti_bayar}`)}
+                                                    onClick={() => setViewProofUrl(`/storage/${tagihan.bukti_transfer}`)}
                                                     className="text-cozy-brown-500 font-bold underline"
                                                 >
                                                     Lihat Struk
@@ -399,7 +396,7 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
                                     </div>
 
                                     <div className="flex gap-2">
-                                        {tagihan.status_pembayaran === 'Belum Bayar' ? (
+                                        {!tagihan.status_lunas ? (
                                             <button 
                                                 onClick={() => handleUpdateStatus(tagihan.id, 'Lunas')}
                                                 className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold shadow-sm transition"
@@ -460,39 +457,23 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
                                                 <option value="">-- Pilih Kamar & Penghuni --</option>
                                                 {sewas.map((sewa) => (
                                                     <option key={sewa.id} value={sewa.id}>
-                                                        Kamar {sewa.kamar?.nomor_kamar} - {sewa.penghuni?.nama}
+                                                        Kamar {sewa.kamar?.nomor_kamar} - {sewa.penyewa?.user?.name}
                                                     </option>
                                                 ))}
                                             </select>
                                             {errors?.sewa_id && <span className="text-orange-600 text-xs mt-1 block font-medium">{errors.sewa_id}</span>}
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 gap-4">
                                             {/* Bulan Tagihan */}
                                             <div>
-                                                <label className="block text-sm font-semibold text-cozy-brown-400 mb-1">Bulan</label>
-                                                <select
+                                                <label className="block text-sm font-semibold text-cozy-brown-400 mb-1">Bulan & Tahun (Pilih dari kalender)</label>
+                                                <input
+                                                    type="month"
                                                     required
                                                     className="w-full bg-cozy-cream-50 border border-cozy-cream-200 text-cozy-brown-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-cozy-brown-500/20 focus:border-cozy-brown-500"
                                                     value={data.bulan_tagihan}
                                                     onChange={e => setData('bulan_tagihan', e.target.value)}
-                                                >
-                                                    {listBulan.map(b => (
-                                                        <option key={b} value={b}>{b}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-
-                                            {/* Tahun Tagihan */}
-                                            <div>
-                                                <label className="block text-sm font-semibold text-cozy-brown-400 mb-1">Tahun</label>
-                                                <input
-                                                    type="text"
-                                                    required
-                                                    maxLength="4"
-                                                    className="w-full bg-cozy-cream-50 border border-cozy-cream-200 text-cozy-brown-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-cozy-brown-500/20 focus:border-cozy-brown-500"
-                                                    value={data.tahun_tagihan}
-                                                    onChange={e => setData('tahun_tagihan', e.target.value)}
                                                 />
                                             </div>
                                         </div>
@@ -506,15 +487,15 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
                                                     type="number"
                                                     required
                                                     placeholder="Jumlah Tagihan"
-                                                    className={`w-full pl-9 pr-4 py-2.5 bg-cozy-cream-50 border ${errors?.jumlah_tagihan ? 'border-orange-400' : 'border-cozy-cream-200'} text-cozy-brown-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-cozy-brown-500/20 focus:border-cozy-brown-500`}
-                                                    value={data.jumlah_tagihan}
-                                                    onChange={e => setData('jumlah_tagihan', e.target.value)}
+                                                    className={`w-full pl-9 pr-4 py-2.5 bg-cozy-cream-50 border ${errors?.jumlah_bayar ? 'border-orange-400' : 'border-cozy-cream-200'} text-cozy-brown-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-cozy-brown-500/20 focus:border-cozy-brown-500`}
+                                                    value={data.jumlah_bayar}
+                                                    onChange={e => setData('jumlah_bayar', e.target.value)}
                                                 />
                                             </div>
                                             <span className="text-[10px] text-cozy-brown-400 mt-1 block">
                                                 *Otomatis terisi sesuai harga sewa bulanan kamar yang dipilih.
                                             </span>
-                                            {errors?.jumlah_tagihan && <span className="text-orange-600 text-xs mt-1 block font-medium">{errors.jumlah_tagihan}</span>}
+                                            {errors?.jumlah_bayar && <span className="text-orange-600 text-xs mt-1 block font-medium">{errors.jumlah_bayar}</span>}
                                         </div>
                                     </div>
                                 </div>

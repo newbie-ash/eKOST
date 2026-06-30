@@ -112,11 +112,10 @@ export default function Penghuni({ penghunis = [] }) {
     // Form Inertia untuk menambah data
     const { data, setData, post, delete: destroy, processing, reset, errors, clearErrors } = useForm({
         nomor_ktp: '',
-        nama: '',
+        name: '',
         email: '',
-        tanggal_lahir: '',
-        alamat: '',
-        nomor_telepon: '',
+        pekerjaan: '',
+        kontak_darurat: '',
     });
 
     const openAddModal = () => {
@@ -157,14 +156,15 @@ export default function Penghuni({ penghunis = [] }) {
         return `https://wa.me/${cleaned}`;
     };
 
-    // Filter data penghuni berdasarkan NIK, nama, atau telp secara client-side
     const filteredPenghunis = penghunis.filter((penghuni) => {
-        const query = searchTerm.toLowerCase();
+        const query = (searchTerm || '').toLowerCase();
+        const safeIncludes = (val) => val ? String(val).toLowerCase().includes(query) : false;
+        
         return (
-            penghuni.nama.toLowerCase().includes(query) ||
-            penghuni.nomor_ktp.includes(query) ||
-            penghuni.nomor_telepon.includes(query) ||
-            (penghuni.user?.email && penghuni.user.email.toLowerCase().includes(query))
+            safeIncludes(penghuni.user?.name) ||
+            safeIncludes(penghuni.nomor_ktp) ||
+            safeIncludes(penghuni.kontak_darurat) ||
+            safeIncludes(penghuni.user?.email)
         );
     });
 
@@ -222,7 +222,7 @@ export default function Penghuni({ penghunis = [] }) {
                                 <tr>
                                     <th className="px-6 py-4 text-left text-xs font-bold text-cozy-brown-400 uppercase tracking-wider">Info Penghuni</th>
                                     <th className="px-6 py-4 text-left text-xs font-bold text-cozy-brown-400 uppercase tracking-wider">Kontak & Akun</th>
-                                    <th className="px-6 py-4 text-left text-xs font-bold text-cozy-brown-400 uppercase tracking-wider">KTP / Tanggal Lahir</th>
+                                    <th className="px-6 py-4 text-left text-xs font-bold text-cozy-brown-400 uppercase tracking-wider">KTP / Pekerjaan</th>
                                     <th className="px-6 py-4 text-right text-xs font-bold text-cozy-brown-400 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
@@ -233,11 +233,11 @@ export default function Penghuni({ penghunis = [] }) {
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center">
                                                     <div className="flex-shrink-0 h-10 w-10 rounded-full bg-cozy-cream-200 text-cozy-brown-600 flex items-center justify-center font-bold">
-                                                        {penghuni.nama.charAt(0).toUpperCase()}
+                                                        {penghuni.user?.name ? penghuni.user.name.charAt(0).toUpperCase() : '?'}
                                                     </div>
                                                     <div className="ml-4">
-                                                        <div className="text-sm font-bold text-cozy-brown-900">{penghuni.nama}</div>
-                                                        <div className="text-xs text-cozy-brown-400 truncate max-w-[200px]" title={penghuni.alamat}>{penghuni.alamat}</div>
+                                                        <div className="text-sm font-bold text-cozy-brown-900">{penghuni.user?.name}</div>
+                                                        <div className="text-xs text-cozy-brown-400 truncate max-w-[200px]" title={penghuni.pekerjaan}>{penghuni.pekerjaan}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -248,9 +248,9 @@ export default function Penghuni({ penghunis = [] }) {
                                                 </div>
                                                 <div className="flex items-center text-xs">
                                                     <Phone className="w-4 h-4 mr-2 text-cozy-brown-300" />
-                                                    <span className="text-cozy-brown-400 font-medium">{penghuni.nomor_telepon}</span>
+                                                    <span className="text-cozy-brown-400 font-medium">{penghuni.kontak_darurat}</span>
                                                     <a 
-                                                        href={getWhatsAppUrl(penghuni.nomor_telepon)}
+                                                        href={getWhatsAppUrl(penghuni.kontak_darurat)}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="ml-2 inline-flex items-center p-1 text-green-600 hover:bg-green-50 rounded transition-colors"
@@ -262,7 +262,7 @@ export default function Penghuni({ penghunis = [] }) {
                                             </td>
                                             <td className="px-6 py-4 text-sm text-cozy-brown-900">
                                                 <div className="font-semibold text-cozy-brown-800 text-xs">{penghuni.nomor_ktp}</div>
-                                                <div className="text-xs text-cozy-brown-400">{penghuni.tanggal_lahir}</div>
+                                                <div className="text-xs text-cozy-brown-400">{penghuni.pekerjaan}</div>
                                             </td>
                                             <td className="px-6 py-4 text-right text-sm font-medium">
                                                 <button 
@@ -296,11 +296,11 @@ export default function Penghuni({ penghunis = [] }) {
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center">
                                             <div className="flex-shrink-0 h-9 w-9 rounded-full bg-cozy-cream-200 text-cozy-brown-600 flex items-center justify-center font-bold text-sm">
-                                                {penghuni.nama.charAt(0).toUpperCase()}
+                                                {penghuni.user?.name ? penghuni.user.name.charAt(0).toUpperCase() : '?'}
                                             </div>
                                             <div className="ml-3">
-                                                <h4 className="text-sm font-bold text-cozy-brown-900">{penghuni.nama}</h4>
-                                                <p className="text-xs text-cozy-brown-400">{penghuni.alamat}</p>
+                                                <h4 className="text-sm font-bold text-cozy-brown-900">{penghuni.user?.name}</h4>
+                                                <p className="text-xs text-cozy-brown-400">{penghuni.pekerjaan}</p>
                                             </div>
                                         </div>
                                         <button 
@@ -317,11 +317,11 @@ export default function Penghuni({ penghunis = [] }) {
                                             <span className="text-cozy-brown-800 break-all">{penghuni.user?.email || '-'}</span>
                                         </div>
                                         <div>
-                                            <span className="block text-cozy-brown-400 font-medium mb-0.5">No. Telepon</span>
+                                            <span className="block text-cozy-brown-400 font-medium mb-0.5">Kontak Darurat</span>
                                             <span className="inline-flex items-center text-cozy-brown-800">
-                                                {penghuni.nomor_telepon}
+                                                {penghuni.kontak_darurat}
                                                 <a 
-                                                    href={getWhatsAppUrl(penghuni.nomor_telepon)}
+                                                    href={getWhatsAppUrl(penghuni.kontak_darurat)}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="ml-1 text-green-600 p-0.5"
@@ -335,8 +335,8 @@ export default function Penghuni({ penghunis = [] }) {
                                             <span className="text-cozy-brown-800">{penghuni.nomor_ktp}</span>
                                         </div>
                                         <div>
-                                            <span className="block text-cozy-brown-400 font-medium mb-0.5">Tanggal Lahir</span>
-                                            <span className="text-cozy-brown-800">{penghuni.tanggal_lahir}</span>
+                                            <span className="block text-cozy-brown-400 font-medium mb-0.5">Pekerjaan</span>
+                                            <span className="text-cozy-brown-800">{penghuni.pekerjaan}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -388,11 +388,11 @@ export default function Penghuni({ penghunis = [] }) {
                                                 type="text" 
                                                 required 
                                                 placeholder="Sesuai KTP"
-                                                className={`w-full bg-cozy-cream-50 border ${errors?.nama ? 'border-orange-400 focus:ring-orange-200' : 'border-cozy-cream-200 focus:ring-cozy-brown-500/20'} text-cozy-brown-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:border-cozy-brown-500`}
-                                                value={data.nama} 
-                                                onChange={e => setData('nama', e.target.value)}
+                                                className={`w-full bg-cozy-cream-50 border ${errors?.name ? 'border-orange-400 focus:ring-orange-200' : 'border-cozy-cream-200 focus:ring-cozy-brown-500/20'} text-cozy-brown-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:border-cozy-brown-500`}
+                                                value={data.name} 
+                                                onChange={e => setData('name', e.target.value)}
                                             />
-                                            {errors?.nama && <span className="text-orange-600 text-xs mt-1 block font-medium">{errors.nama}</span>}
+                                            {errors?.name && <span className="text-orange-600 text-xs mt-1 block font-medium">{errors.name}</span>}
                                         </div>
 
                                         {/* NIK */}
@@ -424,45 +424,32 @@ export default function Penghuni({ penghunis = [] }) {
                                             {errors?.email && <span className="text-orange-600 text-xs mt-1 block font-medium">{errors.email}</span>}
                                         </div>
 
-                                        {/* Tanggal Lahir */}
+                                        {/* Pekerjaan */}
                                         <div>
-                                            <label className="block text-sm font-semibold text-cozy-brown-400 mb-1">Tanggal Lahir</label>
+                                            <label className="block text-sm font-semibold text-cozy-brown-400 mb-1">Pekerjaan</label>
                                             <input
-                                                type="date" 
+                                                type="text" 
                                                 required
-                                                className="w-full bg-cozy-cream-50 border border-cozy-cream-200 text-cozy-brown-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-cozy-brown-500/20 focus:border-cozy-brown-500"
-                                                value={data.tanggal_lahir} 
-                                                onChange={e => setData('tanggal_lahir', e.target.value)}
+                                                placeholder="Mahasiswa / Karyawan"
+                                                className={`w-full bg-cozy-cream-50 border ${errors?.pekerjaan ? 'border-orange-400 focus:ring-orange-200' : 'border-cozy-cream-200 focus:ring-cozy-brown-500/20'} text-cozy-brown-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:border-cozy-brown-500`}
+                                                value={data.pekerjaan} 
+                                                onChange={e => setData('pekerjaan', e.target.value)}
                                             />
-                                            {errors?.tanggal_lahir && <span className="text-orange-600 text-xs mt-1 block font-medium">{errors.tanggal_lahir}</span>}
+                                            {errors?.pekerjaan && <span className="text-orange-600 text-xs mt-1 block font-medium">{errors.pekerjaan}</span>}
                                         </div>
 
-                                        {/* No Telp */}
+                                        {/* Kontak Darurat */}
                                         <div>
-                                            <label className="block text-sm font-semibold text-cozy-brown-400 mb-1">Nomor Telepon/WA</label>
+                                            <label className="block text-sm font-semibold text-cozy-brown-400 mb-1">Kontak Darurat (WA)</label>
                                             <input
                                                 type="text" 
                                                 required 
                                                 placeholder="0812xxxxxx"
-                                                className={`w-full bg-cozy-cream-50 border ${errors?.nomor_telepon ? 'border-orange-400 focus:ring-orange-200' : 'border-cozy-cream-200 focus:ring-cozy-brown-500/20'} text-cozy-brown-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:border-cozy-brown-500`}
-                                                value={data.nomor_telepon} 
-                                                onChange={e => setData('nomor_telepon', e.target.value)}
+                                                className={`w-full bg-cozy-cream-50 border ${errors?.kontak_darurat ? 'border-orange-400 focus:ring-orange-200' : 'border-cozy-cream-200 focus:ring-cozy-brown-500/20'} text-cozy-brown-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:border-cozy-brown-500`}
+                                                value={data.kontak_darurat} 
+                                                onChange={e => setData('kontak_darurat', e.target.value)}
                                             />
-                                            {errors?.nomor_telepon && <span className="text-orange-600 text-xs mt-1 block font-medium">{errors.nomor_telepon}</span>}
-                                        </div>
-
-                                        {/* Alamat Asal */}
-                                        <div className="sm:col-span-2">
-                                            <label className="block text-sm font-semibold text-cozy-brown-400 mb-1">Alamat Asal</label>
-                                            <textarea
-                                                required 
-                                                rows="3" 
-                                                placeholder="Alamat lengkap sesuai KTP"
-                                                className={`w-full bg-cozy-cream-50 border ${errors?.alamat ? 'border-orange-400 focus:ring-orange-200' : 'border-cozy-cream-200 focus:ring-cozy-brown-500/20'} text-cozy-brown-900 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:border-cozy-brown-500 resize-none`}
-                                                value={data.alamat} 
-                                                onChange={e => setData('alamat', e.target.value)}
-                                            ></textarea>
-                                            {errors?.alamat && <span className="text-orange-600 text-xs mt-1 block font-medium">{errors.alamat}</span>}
+                                            {errors?.kontak_darurat && <span className="text-orange-600 text-xs mt-1 block font-medium">{errors.kontak_darurat}</span>}
                                         </div>
                                     </div>
                                 </div>

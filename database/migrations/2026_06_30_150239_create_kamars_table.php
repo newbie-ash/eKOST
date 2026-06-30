@@ -9,12 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('kamars', function (Blueprint $table) {
-            $table->id(); // Pengganti id_kamar VARCHAR(10)
-            $table->string('nomor_kamar', 10);
-            $table->string('tipe_kamar', 50);
-            $table->integer('harga_per_bulan');
-            $table->string('status_kamar', 20)->default('Kosong');
-            $table->timestamps(); // Pengganti created_at
+            $table->id();
+            $table->string('nomor_kamar');
+            $table->string('tipe_kamar');
+            $table->integer('harga');
+            $table->enum('status', ['kosong', 'terisi'])->default('kosong');
+            $table->timestamps();
         });
     }
 

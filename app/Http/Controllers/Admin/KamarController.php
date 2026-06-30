@@ -32,8 +32,8 @@ class KamarController extends Controller
         $request->validate([
             'nomor_kamar' => 'required|string|max:10',
             'tipe_kamar' => 'required|string|max:50',
-            'harga_per_bulan' => 'required|integer',
-            'status_kamar' => 'required|string|max:20',
+            'harga' => 'required|integer',
+            'status' => 'required|string|max:20',
         ]);
 
         // Simpan ke database secara otomatis dengan Eloquent ORM
@@ -52,8 +52,8 @@ class KamarController extends Controller
         $request->validate([
             'nomor_kamar' => 'required|string|max:10',
             'tipe_kamar' => 'required|string|max:50',
-            'harga_per_bulan' => 'required|integer',
-            'status_kamar' => 'required|string|max:20',
+            'harga' => 'required|integer',
+            'status' => 'required|string|max:20',
         ]);
 
         // Update data yang dipilih

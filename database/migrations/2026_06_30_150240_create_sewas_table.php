@@ -10,15 +10,10 @@ return new class extends Migration
     {
         Schema::create('sewas', function (Blueprint $table) {
             $table->id();
-            
-            // Relasi ke anak kos dan kamar
-            $table->foreignId('penghuni_id')->constrained()->cascadeOnDelete();
             $table->foreignId('kamar_id')->constrained()->cascadeOnDelete();
-            
-            // Relasi ke admin/petugas (menggunakan tabel users)
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            
+            $table->foreignId('penyewa_id')->constrained('penyewas')->cascadeOnDelete();
             $table->date('tanggal_masuk');
+            $table->integer('durasi_bulan')->default(1);
             $table->timestamps();
         });
     }

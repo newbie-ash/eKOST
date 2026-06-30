@@ -99,10 +99,17 @@ export default function Kamar({ kamars = [] }) {
 
     const { data, setData, post, put, delete: destroy, processing, reset, errors, clearErrors } = useForm({
         nomor_kamar: '',
-        tipe_kamar: '',
-        harga_per_bulan: '',
-        status_kamar: 'Kosong',
+        tipe_kamar: 'Standar',
+        harga: 500000,
+        status: 'kosong',
     });
+
+    // Handle auto-fill harga based on tipe_kamar
+    const handleTipeKamarChange = (e) => {
+        const selectedTipe = e.target.value;
+        const autoHarga = selectedTipe === 'VIP' ? 1000000 : 500000;
+        setData({ ...data, tipe_kamar: selectedTipe, harga: autoHarga });
+    };
 
     const formatRupiah = (angka) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
@@ -120,8 +127,8 @@ export default function Kamar({ kamars = [] }) {
         setData({
             nomor_kamar: kamar.nomor_kamar,
             tipe_kamar: kamar.tipe_kamar,
-            harga_per_bulan: kamar.harga_per_bulan,
-            status_kamar: kamar.status_kamar,
+            harga: kamar.harga,
+            status: kamar.status,
         });
         setEditingId(kamar.id);
         setModalMode('edit');
@@ -195,15 +202,15 @@ export default function Kamar({ kamars = [] }) {
                                                 {kamar.tipe_kamar}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-[#8B5E3C]">
-                                                {formatRupiah(kamar.harga_per_bulan)}
+                                                {formatRupiah(kamar.harga)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${
-                                                    kamar.status_kamar === 'Kosong' 
+                                                    kamar.status === 'kosong' 
                                                         ? 'bg-green-100 text-green-800 border border-green-200' 
                                                         : 'bg-red-100 text-red-800 border border-red-200'
                                                 }`}>
-                                                    {kamar.status_kamar}
+                                                    {kamar.status === 'kosong' ? 'Kosong' : 'Terisi'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -268,11 +275,13 @@ export default function Kamar({ kamars = [] }) {
 
                                         <div>
                                             <label className="block text-sm font-semibold text-[#7D6B5D] mb-1">Tipe Kamar</label>
-                                            <input
-                                                type="text" required placeholder="Contoh: Kamar Mandi Dalam + AC"
+                                            <select
                                                 className={`w-full bg-[#FAF6F0] border ${errors.tipe_kamar ? 'border-red-500 focus:ring-red-500 shadow-sm' : 'border-[#E8E0D5] focus:ring-[#8B5E3C]'} text-[#4A3B32] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2`}
-                                                value={data.tipe_kamar} onChange={e => setData('tipe_kamar', e.target.value)}
-                                            />
+                                                value={data.tipe_kamar} onChange={handleTipeKamarChange}
+                                            >
+                                                <option value="Standar">Standar</option>
+                                                <option value="VIP">VIP</option>
+                                            </select>
                                             {errors.tipe_kamar && (
                                                 <span className="text-red-500 text-xs mt-1 block font-medium">{errors.tipe_kamar}</span>
                                             )}
@@ -281,26 +290,26 @@ export default function Kamar({ kamars = [] }) {
                                         <div>
                                             <label className="block text-sm font-semibold text-[#7D6B5D] mb-1">Harga Per Bulan (Rp)</label>
                                             <input
-                                                type="number" required min="0" placeholder="Contoh: 1500000"
-                                                className={`w-full bg-[#FAF6F0] border ${errors.harga_per_bulan ? 'border-red-500 focus:ring-red-500 shadow-sm' : 'border-[#E8E0D5] focus:ring-[#8B5E3C]'} text-[#4A3B32] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2`}
-                                                value={data.harga_per_bulan} onChange={e => setData('harga_per_bulan', e.target.value)}
+                                                type="number" required min="0" placeholder="Otomatis terisi"
+                                                className={`w-full bg-[#E8E0D5] border ${errors.harga ? 'border-red-500 focus:ring-red-500 shadow-sm' : 'border-[#D3C6BC]'} text-[#7D6B5D] rounded-xl px-4 py-2.5 focus:outline-none cursor-not-allowed`}
+                                                value={data.harga} readOnly
                                             />
-                                            {errors.harga_per_bulan && (
-                                                <span className="text-red-500 text-xs mt-1 block font-medium">{errors.harga_per_bulan}</span>
+                                            {errors.harga && (
+                                                <span className="text-red-500 text-xs mt-1 block font-medium">{errors.harga}</span>
                                             )}
                                         </div>
 
                                         <div>
                                             <label className="block text-sm font-semibold text-[#7D6B5D] mb-1">Status Kamar</label>
                                             <select
-                                                className={`w-full bg-[#FAF6F0] border ${errors.status_kamar ? 'border-red-500 focus:ring-red-500 shadow-sm' : 'border-[#E8E0D5] focus:ring-[#8B5E3C]'} text-[#4A3B32] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2`}
-                                                value={data.status_kamar} onChange={e => setData('status_kamar', e.target.value)}
+                                                className={`w-full bg-[#FAF6F0] border ${errors.status ? 'border-red-500 focus:ring-red-500 shadow-sm' : 'border-[#E8E0D5] focus:ring-[#8B5E3C]'} text-[#4A3B32] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2`}
+                                                value={data.status} onChange={e => setData('status', e.target.value)}
                                             >
-                                                <option value="Kosong">Kosong</option>
-                                                <option value="Terisi">Terisi</option>
+                                                <option value="kosong">Kosong</option>
+                                                <option value="terisi">Terisi</option>
                                             </select>
-                                            {errors.status_kamar && (
-                                                <span className="text-red-500 text-xs mt-1 block font-medium">{errors.status_kamar}</span>
+                                            {errors.status && (
+                                                <span className="text-red-500 text-xs mt-1 block font-medium">{errors.status}</span>
                                             )}
                                         </div>
                                     </div>

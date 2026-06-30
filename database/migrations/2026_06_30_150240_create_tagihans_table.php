@@ -10,16 +10,11 @@ return new class extends Migration
     {
         Schema::create('tagihans', function (Blueprint $table) {
             $table->id();
-            
-            // Relasi ke data sewa
             $table->foreignId('sewa_id')->constrained()->cascadeOnDelete();
-            
-            $table->string('bulan_tagihan', 20);
-            $table->string('tahun_tagihan', 4);
-            $table->integer('jumlah_tagihan');
-            $table->string('status_pembayaran', 30)->default('Belum Bayar');
-            $table->date('tanggal_pembayaran')->nullable();
-            $table->string('bukti_bayar')->nullable(); // Untuk path foto struk
+            $table->string('bulan_tagihan'); // e.g. "2026-06" or string
+            $table->integer('jumlah_bayar');
+            $table->boolean('status_lunas')->default(false);
+            $table->string('bukti_transfer')->nullable();
             $table->timestamps();
         });
     }

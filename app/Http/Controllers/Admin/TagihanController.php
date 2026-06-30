@@ -12,11 +12,13 @@ class TagihanController extends Controller
 {
     public function index()
     {
-        // Ambil tagihan beserta relasinya (kamar dan penghuninya)
-        $tagihans = Tagihan::with(['sewa.penghuni', 'sewa.kamar'])->latest()->get();
+        // Ambil tagihan beserta relasinya (kamar dan penyewa)
+        $tagihans = Tagihan::with(['sewa.penyewa.user', 'sewa.kamar'])->latest()->get();
         
         // Data sewa aktif untuk form pembuatan tagihan baru
-        $sewas = Sewa::with(['penghuni', 'kamar'])->get();
+        $sewas = Sewa::with(['penyewa.user', 'kamar'])->whereHas('kamar', function($q) {
+            $q->where('status', 'terisi');
+        })->get();
 
         return Inertia::render('Admin/Tagihan', [
             'tagihans' => $tagihans,
@@ -29,11 +31,15 @@ class TagihanController extends Controller
         $request->validate([
             'sewa_id' => 'required|exists:sewas,id',
             'bulan_tagihan' => 'required|string',
-            'tahun_tagihan' => 'required|string',
-            'jumlah_tagihan' => 'required|integer',
+            'jumlah_bayar' => 'required|integer',
         ]);
 
-        Tagihan::create($request->all());
+        Tagihan::create([
+            'sewa_id' => $request->sewa_id,
+            'bulan_tagihan' => $request->bulan_tagihan,
+            'jumlah_bayar' => $request->jumlah_bayar,
+            'status_lunas' => false,
+        ]);
 
         return redirect()->back()->with('message', 'Tagihan bulanan berhasil dibuat!');
     }
@@ -41,10 +47,10 @@ class TagihanController extends Controller
     public function update(Request $request, Tagihan $tagihan)
     {
         $request->validate([
-            'status_pembayaran' => 'required|string',
+            'status_lunas' => 'required|boolean',
         ]);
 
-        $tagihan->update(['status_pembayaran' => $request->status_pembayaran]);
+        $tagihan->update(['status_lunas' => $request->status_lunas]);
 
         return redirect()->back()->with('message', 'Status pembayaran berhasil diperbarui!');
     }

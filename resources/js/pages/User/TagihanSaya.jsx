@@ -64,7 +64,7 @@ export default function TagihanSaya({ tagihans = [], auth = {} }) {
     const getConfirmWhatsAppUrl = (tagihan) => {
         const adminPhone = '6281234567890'; // Default admin number
         const roomNo = tagihan.sewa?.kamar?.nomor_kamar || '';
-        const msg = `Halo Admin eKOS, saya ingin mengonfirmasi pembayaran kos untuk Kamar ${roomNo} bulan ${tagihan.bulan_tagihan} ${tagihan.tahun_tagihan} sebesar ${formatRupiah(tagihan.jumlah_tagihan)}. Berikut terlampir bukti struk transfernya.`;
+        const msg = `Halo Admin eKOS, saya ingin mengonfirmasi pembayaran kos untuk Kamar ${roomNo} bulan ${tagihan.bulan_tagihan} sebesar ${formatRupiah(tagihan.jumlah_bayar)}. Berikut terlampir bukti struk transfernya.`;
         return `https://wa.me/${adminPhone}?text=${encodeURIComponent(msg)}`;
     };
 
@@ -98,31 +98,31 @@ export default function TagihanSaya({ tagihans = [], auth = {} }) {
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <span className="text-xs text-cozy-brown-400 font-semibold block">Periode</span>
-                                            <h4 className="text-base font-bold text-cozy-brown-900">{tagihan.bulan_tagihan} {tagihan.tahun_tagihan}</h4>
+                                            <h4 className="text-base font-bold text-cozy-brown-900">{tagihan.bulan_tagihan}</h4>
                                             <span className="text-[10px] text-cozy-brown-400 mt-0.5 block">Kamar {tagihan.sewa?.kamar?.nomor_kamar} ({tagihan.sewa?.kamar?.tipe_kamar})</span>
                                         </div>
                                         
                                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                                            tagihan.status_pembayaran === 'Lunas' 
+                                            tagihan.status_lunas
                                             ? 'bg-green-50 text-green-700 border border-green-100' 
                                             : 'bg-orange-50 text-orange-700 border border-orange-100'
                                         }`}>
-                                            {tagihan.status_pembayaran === 'Lunas' ? (
+                                            {tagihan.status_lunas ? (
                                                 <CheckCircle className="w-3.5 h-3.5 mr-1" />
                                             ) : (
                                                 <Clock className="w-3.5 h-3.5 mr-1" />
                                             )}
-                                            {tagihan.status_pembayaran}
+                                            {tagihan.status_lunas ? 'Lunas' : 'Belum Bayar'}
                                         </span>
                                     </div>
 
                                     <div className="flex justify-between items-baseline border-t border-cozy-cream-100 pt-4">
                                         <div>
                                             <span className="text-xs text-cozy-brown-400 font-medium block">Total Pembayaran</span>
-                                            <span className="text-lg font-extrabold text-cozy-brown-900">{formatRupiah(tagihan.jumlah_tagihan)}</span>
+                                            <span className="text-lg font-extrabold text-cozy-brown-900">{formatRupiah(tagihan.jumlah_bayar)}</span>
                                         </div>
 
-                                        {tagihan.status_pembayaran === 'Belum Bayar' && (
+                                        {!tagihan.status_lunas && (
                                             <a 
                                                 href={getConfirmWhatsAppUrl(tagihan)}
                                                 target="_blank"

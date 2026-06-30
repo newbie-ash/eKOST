@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
     Plus, Edit, Trash2, X, AlertTriangle, Menu, 
     Home, BedDouble, Users, ReceiptText, LogOut 
 } from 'lucide-react';
 import { Link, Head, useForm } from '@inertiajs/react';
-  
 
 const AdminLayout = ({ children }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -64,7 +63,6 @@ const AdminLayout = ({ children }) => {
                 </div>
             </aside>
 
-            {}
             <div className="flex-1 flex flex-col min-w-0 h-screen">
                 <header className="h-16 bg-white border-b border-[#E8E0D5] flex items-center justify-between px-4 sm:px-6 shadow-sm z-30">
                     <div className="flex items-center">
@@ -99,7 +97,7 @@ export default function Kamar({ kamars = [] }) {
     const [editingId, setEditingId] = useState(null);
     const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
-    const { data, setData, post, put, delete: destroy, processing, reset } = useForm({
+    const { data, setData, post, put, delete: destroy, processing, reset, errors, clearErrors } = useForm({
         nomor_kamar: '',
         tipe_kamar: '',
         harga_per_bulan: '',
@@ -111,16 +109,20 @@ export default function Kamar({ kamars = [] }) {
     };
 
     const openAddModal = () => {
+        clearErrors();
         reset(); 
         setModalMode('add');
         setIsModalOpen(true);
     };
 
     const openEditModal = (kamar) => {
-        setData('nomor_kamar', kamar.nomor_kamar);
-        setData('tipe_kamar', kamar.tipe_kamar);
-        setData('harga_per_bulan', kamar.harga_per_bulan);
-        setData('status_kamar', kamar.status_kamar);
+        clearErrors();
+        setData({
+            nomor_kamar: kamar.nomor_kamar,
+            tipe_kamar: kamar.tipe_kamar,
+            harga_per_bulan: kamar.harga_per_bulan,
+            status_kamar: kamar.status_kamar,
+        });
         setEditingId(kamar.id);
         setModalMode('edit');
         setIsModalOpen(true);
@@ -128,11 +130,12 @@ export default function Kamar({ kamars = [] }) {
 
     const closeModal = () => {
         setIsModalOpen(false);
-        setTimeout(() => { reset(); setEditingId(null); }, 200); 
+        setTimeout(() => { reset(); clearErrors(); setEditingId(null); }, 200); 
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        clearErrors();
         if (modalMode === 'add') {
             post('/admin/kamar', { onSuccess: closeModal });
         } else {
@@ -155,7 +158,6 @@ export default function Kamar({ kamars = [] }) {
             <Head title="Manajemen Kamar Kos" />
 
             <div className="max-w-7xl mx-auto">
-                {}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <div>
                         <h2 className="text-2xl font-extrabold text-[#4A3B32] sm:hidden mb-1">Data Kamar</h2>
@@ -170,7 +172,6 @@ export default function Kamar({ kamars = [] }) {
                     </button>
                 </div>
 
-                {}
                 <div className="bg-white rounded-2xl shadow-sm border border-[#E8E0D5] overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-[#E8E0D5]">
@@ -235,7 +236,6 @@ export default function Kamar({ kamars = [] }) {
                 </div>
             </div>
 
-            {}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[60] overflow-y-auto">
                     <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
@@ -258,38 +258,50 @@ export default function Kamar({ kamars = [] }) {
                                             <label className="block text-sm font-semibold text-[#7D6B5D] mb-1">Nomor Kamar</label>
                                             <input
                                                 type="text" required placeholder="Contoh: A-01"
-                                                className="w-full bg-[#FAF6F0] border border-[#E8E0D5] text-[#4A3B32] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]"
+                                                className={`w-full bg-[#FAF6F0] border ${errors.nomor_kamar ? 'border-red-500 focus:ring-red-500 shadow-sm' : 'border-[#E8E0D5] focus:ring-[#8B5E3C]'} text-[#4A3B32] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2`}
                                                 value={data.nomor_kamar} onChange={e => setData('nomor_kamar', e.target.value)}
                                             />
+                                            {errors.nomor_kamar && (
+                                                <span className="text-red-500 text-xs mt-1 block font-medium">{errors.nomor_kamar}</span>
+                                            )}
                                         </div>
 
                                         <div>
                                             <label className="block text-sm font-semibold text-[#7D6B5D] mb-1">Tipe Kamar</label>
                                             <input
                                                 type="text" required placeholder="Contoh: Kamar Mandi Dalam + AC"
-                                                className="w-full bg-[#FAF6F0] border border-[#E8E0D5] text-[#4A3B32] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]"
+                                                className={`w-full bg-[#FAF6F0] border ${errors.tipe_kamar ? 'border-red-500 focus:ring-red-500 shadow-sm' : 'border-[#E8E0D5] focus:ring-[#8B5E3C]'} text-[#4A3B32] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2`}
                                                 value={data.tipe_kamar} onChange={e => setData('tipe_kamar', e.target.value)}
                                             />
+                                            {errors.tipe_kamar && (
+                                                <span className="text-red-500 text-xs mt-1 block font-medium">{errors.tipe_kamar}</span>
+                                            )}
                                         </div>
 
                                         <div>
                                             <label className="block text-sm font-semibold text-[#7D6B5D] mb-1">Harga Per Bulan (Rp)</label>
                                             <input
                                                 type="number" required min="0" placeholder="Contoh: 1500000"
-                                                className="w-full bg-[#FAF6F0] border border-[#E8E0D5] text-[#4A3B32] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]"
+                                                className={`w-full bg-[#FAF6F0] border ${errors.harga_per_bulan ? 'border-red-500 focus:ring-red-500 shadow-sm' : 'border-[#E8E0D5] focus:ring-[#8B5E3C]'} text-[#4A3B32] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2`}
                                                 value={data.harga_per_bulan} onChange={e => setData('harga_per_bulan', e.target.value)}
                                             />
+                                            {errors.harga_per_bulan && (
+                                                <span className="text-red-500 text-xs mt-1 block font-medium">{errors.harga_per_bulan}</span>
+                                            )}
                                         </div>
 
                                         <div>
                                             <label className="block text-sm font-semibold text-[#7D6B5D] mb-1">Status Kamar</label>
                                             <select
-                                                className="w-full bg-[#FAF6F0] border border-[#E8E0D5] text-[#4A3B32] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]"
+                                                className={`w-full bg-[#FAF6F0] border ${errors.status_kamar ? 'border-red-500 focus:ring-red-500 shadow-sm' : 'border-[#E8E0D5] focus:ring-[#8B5E3C]'} text-[#4A3B32] rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2`}
                                                 value={data.status_kamar} onChange={e => setData('status_kamar', e.target.value)}
                                             >
                                                 <option value="Kosong">Kosong</option>
                                                 <option value="Terisi">Terisi</option>
                                             </select>
+                                            {errors.status_kamar && (
+                                                <span className="text-red-500 text-xs mt-1 block font-medium">{errors.status_kamar}</span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -313,7 +325,6 @@ export default function Kamar({ kamars = [] }) {
                 </div>
             )}
 
-            {}
             {deleteConfirmId && (
                 <div className="fixed inset-0 z-[60] overflow-y-auto">
                     <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">

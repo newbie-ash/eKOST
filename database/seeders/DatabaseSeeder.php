@@ -3,8 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Pemilik;
-use App\Models\Penjaga;
 use App\Models\Penyewa;
 use App\Models\Kamar;
 use App\Models\Sewa;
@@ -17,15 +15,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Buat Akun Admin Utama (Admin)
+        // 1. Buat Akun Admin Utama (Admin/Penjaga)
         $adminUser = User::create([
             'name' => 'Admin Utama',
             'email' => 'admin@ekos.com',
             'password' => Hash::make('password'),
             'role' => 'penjaga',
-        ]);
-        Penjaga::create([
-            'user_id' => $adminUser->id,
             'gaji_perbulan' => 3000000,
             'jam_kerja' => '08:00 - 17:00',
             'kontak_darurat' => '081234567890',
@@ -37,9 +32,6 @@ class DatabaseSeeder extends Seeder
             'email' => 'pemilik@ekos.com',
             'password' => Hash::make('password'),
             'role' => 'pemilik',
-        ]);
-        Pemilik::create([
-            'user_id' => $pemilikUser->id,
             'nama_bank' => 'BCA',
             'nomor_rekening' => '1234567890',
             'atas_nama' => 'Bapak Pemilik Kos',

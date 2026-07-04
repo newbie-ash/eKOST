@@ -26,15 +26,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function pemilik(): HasOne
-    {
-        return $this->hasOne(Pemilik::class);
-    }
 
-    public function penjaga(): HasOne
-    {
-        return $this->hasOne(Penjaga::class);
-    }
 
     public function penyewa(): HasOne
     {

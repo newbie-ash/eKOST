@@ -18,6 +18,17 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['pemilik', 'penjaga', 'penyewa'])->default('penyewa');
+            
+            // Kolom untuk Pemilik (Opsional)
+            $table->string('nama_bank')->nullable();
+            $table->string('nomor_rekening')->nullable();
+            $table->string('atas_nama')->nullable();
+
+            // Kolom untuk Penjaga (Opsional)
+            $table->integer('gaji_perbulan')->nullable();
+            $table->string('jam_kerja')->nullable();
+            $table->string('kontak_darurat')->nullable();
+
             $table->rememberToken();
             $table->timestamps();
         });

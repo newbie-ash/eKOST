@@ -30,14 +30,21 @@ class KamarController extends Controller
     {
         // Validasi: Pastikan admin tidak mengosongkan form
         $request->validate([
-            'nomor_kamar' => 'required|string|max:10',
+            'nomor_kamar' => 'required|string|max:10|unique:kamars,nomor_kamar',
             'tipe_kamar' => 'required|string|max:50',
             'harga' => 'required|integer',
             'status' => 'required|string|max:20',
         ]);
 
         // Simpan ke database secara otomatis dengan Eloquent ORM
-        Kamar::create($request->all());
+        $kamar = Kamar::create($request->all());
+
+        \App\Models\ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'tambah_kamar',
+            'description' => "Menambahkan data kamar baru: Kamar {$request->nomor_kamar} ({$request->tipe_kamar})",
+            'details' => ['kamar_id' => $kamar->id]
+        ]);
 
         // Kembalikan halaman dengan pesan sukses
         return redirect()->back()->with('message', 'Kamar berhasil ditambahkan!');
@@ -50,7 +57,7 @@ class KamarController extends Controller
     {
         // Validasi inputan
         $request->validate([
-            'nomor_kamar' => 'required|string|max:10',
+            'nomor_kamar' => 'required|string|max:10|unique:kamars,nomor_kamar,' . $kamar->id,
             'tipe_kamar' => 'required|string|max:50',
             'harga' => 'required|integer',
             'status' => 'required|string|max:20',
@@ -58,6 +65,13 @@ class KamarController extends Controller
 
         // Update data yang dipilih
         $kamar->update($request->all());
+
+        \App\Models\ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'edit_kamar',
+            'description' => "Mengedit data Kamar {$request->nomor_kamar}",
+            'details' => ['kamar_id' => $kamar->id]
+        ]);
 
         return redirect()->back()->with('message', 'Data Kamar berhasil diperbarui!');
     }
@@ -67,8 +81,16 @@ class KamarController extends Controller
      */
     public function destroy(Kamar $kamar)
     {
+        $nomor = $kamar->nomor_kamar;
         // Hapus data dari database
         $kamar->delete();
+
+        \App\Models\ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'hapus_kamar',
+            'description' => "Menghapus data Kamar {$nomor}",
+            'details' => ['kamar_id' => $kamar->id ?? null]
+        ]);
 
         return redirect()->back()->with('message', 'Kamar berhasil dihapus!');
     }

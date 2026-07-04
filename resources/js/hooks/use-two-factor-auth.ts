@@ -1,4 +1,4 @@
-import { useHttp } from '@inertiajs/react';
+import axios from 'axios';
 import { useCallback, useState } from 'react';
 import { qrCode, recoveryCodes, secretKey } from '@/routes/two-factor';
 
@@ -20,7 +20,10 @@ export type UseTwoFactorAuthReturn = {
 export const OTP_MAX_LENGTH = 6;
 
 export const useTwoFactorAuth = (): UseTwoFactorAuthReturn => {
-    const { submit } = useHttp();
+    const submit = async (config) => {
+        const response = await axios(config);
+        return response.data;
+    };
 
     const [qrCodeSvg, setQrCodeSvg] = useState<string | null>(null);
     const [manualSetupKey, setManualSetupKey] = useState<string | null>(null);

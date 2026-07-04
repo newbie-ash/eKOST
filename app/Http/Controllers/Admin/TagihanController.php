@@ -34,17 +34,24 @@ class TagihanController extends Controller
             'jumlah_bayar' => 'required|integer',
         ]);
 
-        Tagihan::create([
+        $tagihan = Tagihan::create([
             'sewa_id' => $request->sewa_id,
             'bulan_tagihan' => $request->bulan_tagihan,
             'jumlah_bayar' => $request->jumlah_bayar,
             'status_lunas' => false,
         ]);
 
+        \App\Models\ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'buat_tagihan',
+            'description' => "Membuat tagihan baru untuk bulan {$request->bulan_tagihan} sejumlah " . number_format($request->jumlah_bayar, 0, ',', '.'),
+            'details' => ['tagihan_id' => $tagihan->id]
+        ]);
+
         return redirect()->back()->with('message', 'Tagihan bulanan berhasil dibuat!');
     }
 
-    public function update(Request $request, Tagihan $tagihan)
+    public function updateStatus(Request $request, Tagihan $tagihan)
     {
         $request->validate([
             'status_lunas' => 'required|boolean',
@@ -52,12 +59,30 @@ class TagihanController extends Controller
 
         $tagihan->update(['status_lunas' => $request->status_lunas]);
 
+        $status_text = $request->status_lunas ? 'Lunas' : 'Belum Lunas';
+        \App\Models\ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'update_tagihan',
+            'description' => "Mengubah status tagihan bulan {$tagihan->bulan_tagihan} menjadi {$status_text}",
+            'details' => ['tagihan_id' => $tagihan->id, 'status' => $request->status_lunas]
+        ]);
+
         return redirect()->back()->with('message', 'Status pembayaran berhasil diperbarui!');
     }
 
     public function destroy(Tagihan $tagihan)
     {
+        $id = $tagihan->id;
+        $bulan = $tagihan->bulan_tagihan;
         $tagihan->delete();
+
+        \App\Models\ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'hapus_tagihan',
+            'description' => "Menghapus data tagihan bulan {$bulan}",
+            'details' => ['tagihan_id' => $id]
+        ]);
+
         return redirect()->back()->with('message', 'Tagihan berhasil dihapus!');
     }
 }

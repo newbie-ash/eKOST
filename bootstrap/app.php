@@ -21,6 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // Daftarkan middleware dengan nama panggilan 'admin'
         $middleware->alias([
             'admin' => \App\Http\Middleware\IsAdmin::class,
+            'pemilik' => \App\Http\Middleware\IsPemilik::class,
+        ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'midtrans/webhook',
         ]);
         
     })

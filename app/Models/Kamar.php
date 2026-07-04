@@ -21,4 +21,9 @@ class Kamar extends Model
     {
         return $this->hasMany(Komplain::class);
     }
+
+    public function pengeluarans(): HasMany
+    {
+        return $this->hasMany(Pengeluaran::class);
+    }
 }

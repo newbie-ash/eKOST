@@ -23,7 +23,7 @@ return new class extends Migration
 
         Schema::table('sewas', function (Blueprint $table) {
             $table->date('tanggal_keluar')->nullable()->after('durasi_bulan');
-            $table->enum('status_sewa', ['Aktif', 'Selesai'])->default('Aktif')->after('tanggal_keluar');
+            $table->enum('status_sewa', ['Aktif', 'Selesai', 'Menunggu Konfirmasi'])->default('Aktif')->after('tanggal_keluar');
         });
 
         Schema::table('tagihans', function (Blueprint $table) {

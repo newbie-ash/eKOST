@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('nomor_kamar');
             $table->string('tipe_kamar');
             $table->integer('harga');
-            $table->enum('status', ['kosong', 'terisi'])->default('kosong');
+            $table->enum('status', ['kosong', 'terisi', 'dibooking'])->default('kosong');
             $table->timestamps();
         });
     }

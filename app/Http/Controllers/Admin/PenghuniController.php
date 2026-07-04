@@ -48,16 +48,31 @@ class PenghuniController extends Controller
             'kontak_darurat' => $request->kontak_darurat,
         ]);
 
+        \App\Models\ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'add_penghuni',
+            'description' => "Menambahkan penghuni baru bernama {$request->name}",
+            'details' => ['email' => $request->email]
+        ]);
+
         return redirect()->back()->with('message', 'Penghuni berhasil ditambahkan! Password default: kos12345');
     }
 
     public function destroy(Penyewa $penghuni)
     {
         $user = User::find($penghuni->user_id);
+        $name = $user ? $user->name : 'Unknown';
         
         if ($user) {
             $user->delete();
         }
+
+        \App\Models\ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'delete_penghuni',
+            'description' => "Menghapus data penghuni bernama {$name}",
+            'details' => ['penghuni_id' => $penghuni->id]
+        ]);
 
         return redirect()->back()->with('message', 'Data Penghuni beserta Akunnya berhasil dihapus!');
     }

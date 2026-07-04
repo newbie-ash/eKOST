@@ -26,9 +26,9 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - laravel/sail (SAIL) - v1
 - pestphp/pest (PEST) - v4
 - phpunit/phpunit (PHPUNIT) - v12
-- @inertiajs/react (INERTIA_REACT) - v3
-- react (REACT) - v19
-- tailwindcss (TAILWINDCSS) - v4
+- @inertiajs/react (INERTIA_REACT) - v2
+- react (REACT) - v18
+- tailwindcss (TAILWINDCSS) - v3
 - @laravel/vite-plugin-wayfinder (WAYFINDER_VITE) - v0
 - eslint (ESLINT) - v9
 - prettier (PRETTIER) - v3
@@ -131,7 +131,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 # Inertia
 
 - Inertia creates fully client-side rendered SPAs without modern SPA complexity, leveraging existing server-side patterns.
-- Components live in `resources/js/pages` (unless specified in `vite.config.js`). Use `Inertia::render()` for server-side routing instead of Blade views.
+- Components live in `resources/js/Pages` (unless specified in `vite.config.js`). Use `Inertia::render()` for server-side routing instead of Blade views.
 - ALWAYS use `search-docs` tool for version-specific Inertia documentation and updated code examples.
 - IMPORTANT: Activate `inertia-react-development` when working with Inertia client-side patterns.
 

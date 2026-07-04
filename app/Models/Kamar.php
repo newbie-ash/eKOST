@@ -12,6 +12,10 @@ class Kamar extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'galeri_foto' => 'array',
+    ];
+
     public function sewas(): HasMany
     {
         return $this->hasMany(Sewa::class);

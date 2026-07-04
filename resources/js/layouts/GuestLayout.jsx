@@ -1,9 +1,15 @@
 import { BedDouble } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { useEffect } from 'react';
 
 export default function GuestLayout({ children }) {
+    useEffect(() => {
+        // Force light mode on auth pages
+        document.documentElement.classList.remove('dark');
+    }, []);
+
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-cozy-cream-50 px-4 py-8 relative overflow-hidden">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-cozy-cream-50 px-4 py-8 relative overflow-hidden transition-colors duration-200">
             {/* Background Warm Cozy Blur Orbs */}
             <div className="absolute -left-20 -top-20 w-80 h-80 bg-cozy-cream-200 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
             <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-cozy-cream-200 rounded-full blur-3xl opacity-60 pointer-events-none"></div>

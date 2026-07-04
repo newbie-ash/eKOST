@@ -34,10 +34,24 @@ class KamarController extends Controller
             'tipe_kamar' => 'required|string|max:50',
             'harga' => 'required|integer',
             'status' => 'required|string|max:20',
+            'fasilitas' => 'nullable|string',
+            'deskripsi' => 'nullable|string',
+            'link_maps' => 'nullable|string',
+            'galeri_foto.*' => 'nullable|image|max:2048',
         ]);
 
+        $data = $request->except('galeri_foto');
+
+        if ($request->hasFile('galeri_foto')) {
+            $paths = [];
+            foreach ($request->file('galeri_foto') as $file) {
+                $paths[] = $file->store('kamar_galeri', 'public');
+            }
+            $data['galeri_foto'] = $paths;
+        }
+
         // Simpan ke database secara otomatis dengan Eloquent ORM
-        $kamar = Kamar::create($request->all());
+        $kamar = Kamar::create($data);
 
         \App\Models\ActivityLog::create([
             'user_id' => auth()->id(),
@@ -61,10 +75,26 @@ class KamarController extends Controller
             'tipe_kamar' => 'required|string|max:50',
             'harga' => 'required|integer',
             'status' => 'required|string|max:20',
+            'fasilitas' => 'nullable|string',
+            'deskripsi' => 'nullable|string',
+            'link_maps' => 'nullable|string',
+            'galeri_foto.*' => 'nullable|image|max:2048',
         ]);
 
+        $data = $request->except('galeri_foto');
+
+        if ($request->hasFile('galeri_foto')) {
+            $paths = [];
+            foreach ($request->file('galeri_foto') as $file) {
+                $paths[] = $file->store('kamar_galeri', 'public');
+            }
+            $data['galeri_foto'] = $paths;
+            
+            // Optionally delete old files here, but keeping it simple for now
+        }
+
         // Update data yang dipilih
-        $kamar->update($request->all());
+        $kamar->update($data);
 
         \App\Models\ActivityLog::create([
             'user_id' => auth()->id(),

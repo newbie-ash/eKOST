@@ -11,7 +11,14 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'kamars' => $kamars,
     ]);
-});
+})->name('welcome');
+
+Route::get('/kamar/{kamar}', function (\App\Models\Kamar $kamar) {
+    return Inertia::render('KamarDetail', [
+        'kamar' => $kamar,
+    ]);
+})->name('kamar.detail');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         if (auth()->user()->role === 'pemilik') {
@@ -34,6 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Komplain
     Route::get('/user/komplain', [\App\Http\Controllers\User\KomplainController::class, 'index'])->name('user.komplain.index');
     Route::post('/user/komplain', [\App\Http\Controllers\User\KomplainController::class, 'store'])->name('user.komplain.store');
+    Route::post('/user/komplain/{komplain}/rate', [\App\Http\Controllers\User\KomplainController::class, 'rate'])->name('user.komplain.rate');
     
     // Profile
     Route::get('/profile', [\App\Http\Controllers\User\ProfileController::class, 'edit'])->name('user.profile.edit');

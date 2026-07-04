@@ -17,7 +17,7 @@ class KomplainController extends Controller
         
         // Pastikan user adalah penyewa
         if (!$user->penyewa) {
-            return redirect()->route('dashboard')->with('error', 'Anda harus melengkapi profil terlebih dahulu.');
+            return redirect()->route('pilih-kamar.index')->with('error', 'Anda harus menyewa kamar terlebih dahulu.');
         }
 
         // Ambil riwayat komplain user ini
@@ -68,5 +68,30 @@ class KomplainController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Laporan kerusakan berhasil dikirim.');
+    }
+
+    public function rate(Request $request, Komplain $komplain)
+    {
+        $user = $request->user();
+        
+        if (!$user->penyewa || $komplain->penyewa_id !== $user->penyewa->id) {
+            return redirect()->back()->with('error', 'Akses ditolak.');
+        }
+
+        if ($komplain->status !== 'Selesai') {
+            return redirect()->back()->with('error', 'Komplain belum selesai, tidak dapat memberikan penilaian.');
+        }
+
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'ulasan_penyewa' => 'nullable|string|max:1000',
+        ]);
+
+        $komplain->update([
+            'rating' => $request->rating,
+            'ulasan_penyewa' => $request->ulasan_penyewa,
+        ]);
+
+        return redirect()->back()->with('success', 'Terima kasih atas penilaian Anda.');
     }
 }

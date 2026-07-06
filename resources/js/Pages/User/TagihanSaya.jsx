@@ -20,7 +20,7 @@ export default function TagihanSaya({ tagihans = [], auth = {} }) {
     };
 
     const getConfirmWhatsAppUrl = (tagihan) => {
-        const adminPhone = '6281234567890'; // Default admin number
+        const adminPhone = '62895601322323'; // Admin number
         const roomNo = tagihan.sewa?.kamar?.nomor_kamar || '';
         const msg = `Halo Admin eKOS, saya ingin mengonfirmasi pembayaran kos untuk Kamar ${roomNo} bulan ${tagihan.bulan_tagihan} sebesar ${formatRupiah(tagihan.jumlah_bayar)}. Berikut terlampir bukti struk transfernya.`;
         return `https://wa.me/${adminPhone}?text=${encodeURIComponent(msg)}`;

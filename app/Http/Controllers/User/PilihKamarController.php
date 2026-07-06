@@ -66,7 +66,7 @@ class PilihKamarController extends Controller
         }
 
         // Hitung tanggal keluar
-        $tanggalKeluar = Carbon::parse($request->tanggal_masuk)->addMonths($request->durasi_bulan);
+        $tanggalKeluar = Carbon::parse($request->tanggal_masuk)->addMonths((int) $request->durasi_bulan);
 
         // Buat pengajuan sewa
         Sewa::create([

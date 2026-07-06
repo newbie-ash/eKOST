@@ -84,7 +84,7 @@ export default function Penghuni({ penghunis = [] }) {
                     </div>
                     <button
                         onClick={openAddModal}
-                        className="w-full md:w-auto inline-flex items-center justify-center px-5 py-3 bg-cozy-brown-500 text-white rounded-xl font-semibold shadow-md shadow-cozy-brown-500/10 hover:bg-cozy-brown-600 transition-all duration-200"
+                        className="w-full md:w-auto inline-flex items-center justify-center px-5 py-3 bg-cozy-brown-500 dark:bg-slate-700 text-white rounded-xl font-semibold shadow-md shadow-cozy-brown-500/10 dark:shadow-none dark:border dark:border-slate-600 hover:bg-cozy-brown-600 dark:hover:bg-slate-600 transition-all duration-200"
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         Tambah Penghuni

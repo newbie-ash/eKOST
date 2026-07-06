@@ -13,7 +13,32 @@ class TagihanController extends Controller
     public function index()
     {
         // Ambil tagihan beserta relasinya (kamar dan penyewa)
-        $tagihans = Tagihan::with(['sewa.penyewa.user', 'sewa.kamar'])->latest()->get();
+        $tagihans = Tagihan::with(['sewa.penyewa.user', 'sewa.kamar'])->latest()->get()->map(function($tagihan) {
+            $is_late = false;
+            
+            if (!$tagihan->status_lunas && $tagihan->sewa && $tagihan->sewa->tanggal_masuk) {
+                // Parse bulan_tagihan safely (handle both "2026-07" and "July" formats)
+                try {
+                    $bulanTagihan = \Carbon\Carbon::createFromFormat('Y-m', $tagihan->bulan_tagihan);
+                } catch (\Exception $e) {
+                    $bulanTagihan = \Carbon\Carbon::parse($tagihan->bulan_tagihan);
+                }
+                $tanggalMasuk = \Carbon\Carbon::parse($tagihan->sewa->tanggal_masuk);
+                
+                // Set the day of the due date to the day they started renting
+                $dueDate = $bulanTagihan->copy()->day($tanggalMasuk->day);
+                
+                // If today is past the due date, it's late
+                if (\Carbon\Carbon::now()->startOfDay()->gt($dueDate)) {
+                    $is_late = true;
+                }
+                
+                $tagihan->due_date = $dueDate->translatedFormat('d F Y');
+            }
+            
+            $tagihan->is_late = $is_late;
+            return $tagihan;
+        });
         
         // Data sewa aktif untuk form pembuatan tagihan baru
         $sewas = Sewa::with(['penyewa.user', 'kamar'])->whereHas('kamar', function($q) {

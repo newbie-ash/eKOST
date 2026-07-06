@@ -210,28 +210,28 @@ function DashboardContent({ metrik, aktivitasTerbaru }) {
 
                 {/* Sidebar (1/3 width) - Quick Actions */}
                 <div className="space-y-6">
-                    <div className="bg-[#8B5E3C] rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                    <div className="bg-[#8B5E3C] dark:bg-slate-800 rounded-2xl p-6 text-white shadow-lg dark:border dark:border-slate-700 relative overflow-hidden transition-colors">
                         <div className="relative z-10">
                             <h3 className="font-bold text-lg mb-2">Tindakan Cepat</h3>
-                            <p className="text-amber-100 text-sm mb-6">Kelola kos Anda dengan lebih efisien.</p>
+                            <p className="text-amber-100 dark:text-slate-400 text-sm mb-6">Kelola kos Anda dengan lebih efisien.</p>
                             
                             <div className="space-y-3">
-                                <Link href="/admin/sewa" className="flex items-center justify-between w-full bg-white dark:bg-white/10 hover:bg-white/90 dark:hover:bg-white/20 p-3 rounded-xl backdrop-blur-sm transition-all border border-white/10 text-[#8B5E3C] dark:text-white">
+                                <Link href="/admin/sewa" className="flex items-center justify-between w-full bg-white dark:bg-slate-700 hover:bg-white/90 dark:hover:bg-slate-600 p-3 rounded-xl backdrop-blur-sm transition-all border border-white/10 dark:border-slate-600 text-[#8B5E3C] dark:text-white">
                                     <span className="flex items-center text-sm font-medium"><Plus className="w-4 h-4 mr-2" /> Penempatan Baru</span>
                                     <ArrowUpRight className="w-4 h-4 opacity-50" />
                                 </Link>
-                                <Link href="/admin/tagihan" className="flex items-center justify-between w-full bg-white dark:bg-white/10 hover:bg-white/90 dark:hover:bg-white/20 p-3 rounded-xl backdrop-blur-sm transition-all border border-white/10 text-[#8B5E3C] dark:text-white">
+                                <Link href="/admin/tagihan" className="flex items-center justify-between w-full bg-white dark:bg-slate-700 hover:bg-white/90 dark:hover:bg-slate-600 p-3 rounded-xl backdrop-blur-sm transition-all border border-white/10 dark:border-slate-600 text-[#8B5E3C] dark:text-white">
                                     <span className="flex items-center text-sm font-medium"><ReceiptText className="w-4 h-4 mr-2" /> Buat Tagihan</span>
                                     <ArrowUpRight className="w-4 h-4 opacity-50" />
                                 </Link>
-                                <Link href="/admin/kamar" className="flex items-center justify-between w-full bg-white dark:bg-white/10 hover:bg-white/90 dark:hover:bg-white/20 p-3 rounded-xl backdrop-blur-sm transition-all border border-white/10 text-[#8B5E3C] dark:text-white">
+                                <Link href="/admin/kamar" className="flex items-center justify-between w-full bg-white dark:bg-slate-700 hover:bg-white/90 dark:hover:bg-slate-600 p-3 rounded-xl backdrop-blur-sm transition-all border border-white/10 dark:border-slate-600 text-[#8B5E3C] dark:text-white">
                                     <span className="flex items-center text-sm font-medium"><BedDouble className="w-4 h-4 mr-2" /> Kelola Kamar</span>
                                     <ArrowUpRight className="w-4 h-4 opacity-50" />
                                 </Link>
                             </div>
                         </div>
                         {/* Decorative background element */}
-                        <Sparkles className="absolute -bottom-4 -right-4 w-32 h-32 text-amber-700/30" strokeWidth={1} />
+                        <Sparkles className="absolute -bottom-4 -right-4 w-32 h-32 text-amber-700/30 dark:text-slate-700/50" strokeWidth={1} />
                     </div>
                 </div>
 

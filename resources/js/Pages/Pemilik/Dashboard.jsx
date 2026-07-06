@@ -3,7 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { 
     Banknote, BedDouble, Users, TrendingUp, TrendingDown, 
-    Activity, Clock, ChevronRight, BarChart3, PieChart as PieChartIcon
+    Activity, Clock, ChevronRight, BarChart3, PieChart as PieChartIcon, Download
 } from 'lucide-react';
 import { 
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
@@ -26,7 +26,7 @@ export default function Dashboard({ stats, recentActivities, chartData }) {
             <Head title="Dashboard Eksekutif" />
 
             <div className="space-y-6">
-                <div className="flex justify-between items-end">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                             <Activity className="w-6 h-6 text-cozy-brown-500" />
@@ -36,6 +36,14 @@ export default function Dashboard({ stats, recentActivities, chartData }) {
                             Ringkasan performa bisnis eKOS bulan ini.
                         </p>
                     </div>
+                    <a 
+                        href="/pemilik/export-pdf" 
+                        target="_blank" 
+                        className="inline-flex justify-center items-center gap-2 bg-cozy-brown-600 hover:bg-cozy-brown-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:border dark:border-slate-600 text-white px-4 py-2.5 rounded-xl font-bold shadow-md shadow-cozy-brown-600/20 dark:shadow-none transition-all active:scale-95"
+                    >
+                        <Download className="w-5 h-5" />
+                        Download Laporan PDF
+                    </a>
                 </div>
 
                 {/* Top Metriks */}
@@ -79,7 +87,11 @@ export default function Dashboard({ stats, recentActivities, chartData }) {
                         </div>
                     </div>
 
-                    <div className={`rounded-2xl p-5 shadow-sm border relative overflow-hidden group hover:shadow-md transition-shadow ${stats.laba_bersih >= 0 ? 'bg-gradient-to-br from-cozy-brown-500 to-cozy-brown-600 border-cozy-brown-600' : 'bg-gradient-to-br from-red-500 to-red-600 border-red-600'}`}>
+                    <div className={`rounded-2xl p-5 shadow-sm border relative overflow-hidden group hover:shadow-md transition-shadow ${
+                        stats.laba_bersih >= 0 
+                        ? 'bg-gradient-to-br from-cozy-brown-500 to-cozy-brown-600 dark:from-cozy-brown-900 dark:to-slate-800 border-cozy-brown-600 dark:border-cozy-brown-800' 
+                        : 'bg-gradient-to-br from-red-500 to-red-600 dark:from-red-900/80 dark:to-slate-800 border-red-600 dark:border-red-900/50'
+                    }`}>
                         <div className="absolute -right-4 -top-4 bg-white/10 w-24 h-24 rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
                             <Banknote className="w-8 h-8 text-white opacity-20" />
                         </div>

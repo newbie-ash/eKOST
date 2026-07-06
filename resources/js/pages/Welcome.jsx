@@ -47,7 +47,7 @@ export default function Welcome({ auth, kamars }) {
                                         <>
                                             <Link
                                                 href={route('login')}
-                                                className="text-sm font-bold text-gray-700 dark:text-gray-200 hover:text-[#8B5E3C] dark:hover:text-[#D4A373] transition hidden sm:block bg-white/50 dark:bg-slate-800/50 px-4 py-2 rounded-lg border border-white/40 dark:border-slate-700/50"
+                                                className="text-sm font-bold text-gray-700 dark:text-gray-200 hover:text-[#8B5E3C] dark:hover:text-[#D4A373] transition bg-white/50 dark:bg-slate-800/50 px-4 py-2 rounded-lg border border-white/40 dark:border-slate-700/50"
                                             >
                                                 Masuk
                                             </Link>

@@ -111,7 +111,7 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
                     <button
                         onClick={openAddModal}
                         disabled={sewas.length === 0}
-                        className="w-full md:w-auto inline-flex items-center justify-center px-5 py-3 bg-cozy-brown-500 text-white rounded-xl font-semibold shadow-md shadow-cozy-brown-500/10 hover:bg-cozy-brown-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                        className="w-full md:w-auto inline-flex items-center justify-center px-5 py-3 bg-cozy-brown-500 dark:bg-slate-700 text-white rounded-xl font-semibold shadow-md shadow-cozy-brown-500/10 dark:shadow-none dark:border dark:border-slate-600 hover:bg-cozy-brown-600 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         Buat Tagihan Baru
@@ -177,8 +177,15 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
                                                 <div className="text-sm font-bold text-cozy-brown-900 dark:text-white">Kamar {tagihan.sewa?.kamar?.nomor_kamar}</div>
                                                 <div className="text-xs text-cozy-brown-400 dark:text-white font-medium">{tagihan.sewa?.penyewa?.user?.name}</div>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-cozy-brown-900 dark:text-white font-semibold">
-                                                {tagihan.bulan_tagihan}
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-cozy-brown-900 dark:text-white font-semibold mb-1">
+                                                    {tagihan.bulan_tagihan}
+                                                </div>
+                                                {tagihan.is_late && (
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700 border border-red-200">
+                                                        🚨 Terlambat (Jatuh tempo: {tagihan.due_date})
+                                                    </span>
+                                                )}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-cozy-brown-900 dark:text-white font-bold">
                                                 {formatRupiah(tagihan.jumlah_bayar)}
@@ -269,7 +276,12 @@ export default function Tagihan({ tagihans = [], sewas = [] }) {
                                     <div className="grid grid-cols-2 gap-2 text-xs bg-cozy-cream-50 dark:bg-slate-900 p-3 rounded-lg border border-cozy-cream-200 dark:border-slate-700">
                                         <div>
                                             <span className="block text-cozy-brown-400 dark:text-white font-medium mb-0.5">Bulan</span>
-                                            <span className="text-cozy-brown-900 dark:text-white font-bold">{tagihan.bulan_tagihan}</span>
+                                            <span className="text-cozy-brown-900 dark:text-white font-bold block">{tagihan.bulan_tagihan}</span>
+                                            {tagihan.is_late && (
+                                                <span className="inline-block mt-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-100 text-red-700 border border-red-200">
+                                                    🚨 Jatuh tempo: {tagihan.due_date}
+                                                </span>
+                                            )}
                                         </div>
                                         <div>
                                             <span className="block text-cozy-brown-400 dark:text-white font-medium mb-0.5">Jumlah</span>

@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
             'role' => 'penjaga',
             'gaji_perbulan' => 3000000,
             'jam_kerja' => '08:00 - 17:00',
-            'kontak_darurat' => '081234567890',
+            'kontak_darurat' => '0895601322323',
         ]);
 
         // Akun Pemilik (opsional)
@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             'nama_bank' => 'BCA',
             'nomor_rekening' => '1234567890',
             'atas_nama' => 'Bapak Pemilik Kos',
+            'kontak_darurat' => '0895601322323',
         ]);
 
         // 2. Buat 5 Kamar
@@ -58,11 +59,11 @@ class DatabaseSeeder extends Seeder
 
         // 3. Buat 5 Penghuni (Penyewa) beserta akun
         $penyewasData = [
-            ['nama' => 'Budi Santoso', 'email' => 'budi@ekos.com', 'jk' => 'L', 'pekerjaan' => 'Mahasiswa', 'ktp' => '32710001'],
-            ['nama' => 'Andi Wijaya', 'email' => 'andi@ekos.com', 'jk' => 'L', 'pekerjaan' => 'Karyawan Swasta', 'ktp' => '32710002'],
-            ['nama' => 'Siti Aminah', 'email' => 'siti@ekos.com', 'jk' => 'P', 'pekerjaan' => 'Mahasiswi', 'ktp' => '32710003'],
-            ['nama' => 'Rina Melati', 'email' => 'rina@ekos.com', 'jk' => 'P', 'pekerjaan' => 'Guru', 'ktp' => '32710004'],
-            ['nama' => 'Doni Kusuma', 'email' => 'doni@ekos.com', 'jk' => 'L', 'pekerjaan' => 'Freelancer', 'ktp' => '32710005'],
+            ['nama' => 'Safira Azzahra Saragih', 'email' => 'safira@ekos.com', 'jk' => 'P', 'pekerjaan' => 'Mahasiswi', 'ktp' => '32710001', 'telepon' => '085260439844'],
+            ['nama' => 'Dwi Siska Hariani', 'email' => 'dwi@ekos.com', 'jk' => 'P', 'pekerjaan' => 'Mahasiswi', 'ktp' => '32710002', 'telepon' => '081361845504'],
+            ['nama' => 'Annisa Liandes', 'email' => 'annisa@ekos.com', 'jk' => 'P', 'pekerjaan' => 'Mahasiswi', 'ktp' => '32710003', 'telepon' => '082273013438'],
+            ['nama' => 'Lidya Wulan Cahya', 'email' => 'lidya@ekos.com', 'jk' => 'P', 'pekerjaan' => 'Mahasiswi', 'ktp' => '32710004', 'telepon' => '082365413730'],
+            ['nama' => 'Muhammad Dzakwan Hanif', 'email' => 'muhammad@ekos.com', 'jk' => 'L', 'pekerjaan' => 'Mahasiswa', 'ktp' => '32710005', 'telepon' => '082253204649'],
         ];
 
         $penyewas = [];
@@ -78,6 +79,7 @@ class DatabaseSeeder extends Seeder
                 'user_id' => $user->id,
                 'nomor_ktp' => $p['ktp'],
                 'pekerjaan' => $p['pekerjaan'],
+                'telepon' => $p['telepon'],
                 'kontak_darurat' => '08900000' . $index,
                 'jenis_kelamin' => $p['jk'],
                 'nama_kontak_darurat' => 'Keluarga ' . $p['nama'],

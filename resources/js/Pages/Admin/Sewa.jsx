@@ -57,7 +57,7 @@ export default function Sewa({ sewas, kamars, penyewas }) {
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-[#8B5E3C] hover:bg-[#7D6B5D] text-white font-bold py-2 px-6 rounded-lg shadow-md transition-colors flex items-center gap-2"
+                    className="bg-[#8B5E3C] dark:bg-slate-700 hover:bg-[#7D6B5D] dark:hover:bg-slate-600 text-white font-bold py-2 px-6 rounded-lg shadow-md dark:shadow-none dark:border dark:border-slate-600 transition-colors flex items-center gap-2"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />

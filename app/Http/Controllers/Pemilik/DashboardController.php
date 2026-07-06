@@ -79,4 +79,35 @@ class DashboardController extends Controller
             'chartData' => $chartData
         ]);
     }
+
+    public function exportPdf()
+    {
+        $bulanSekarang = Carbon::now()->month;
+        $tahunSekarang = Carbon::now()->year;
+
+        $pemasukan = Tagihan::with(['sewa.kamar', 'sewa.penyewa.user'])
+            ->where('status_lunas', true)
+            ->whereMonth('created_at', $bulanSekarang)
+            ->whereYear('created_at', $tahunSekarang)
+            ->get();
+
+        $pengeluaran = Pengeluaran::whereMonth('tanggal', $bulanSekarang)
+            ->whereYear('tanggal', $tahunSekarang)
+            ->get();
+
+        $totalPemasukan = $pemasukan->sum('jumlah_bayar');
+        $totalPengeluaran = $pengeluaran->sum('jumlah');
+        $labaBersih = $totalPemasukan - $totalPengeluaran;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('laporan-keuangan', [
+            'pemasukan' => $pemasukan,
+            'pengeluaran' => $pengeluaran,
+            'totalPemasukan' => $totalPemasukan,
+            'totalPengeluaran' => $totalPengeluaran,
+            'labaBersih' => $labaBersih,
+            'bulan' => Carbon::now()->translatedFormat('F Y'),
+        ]);
+
+        return $pdf->download('Laporan_Keuangan_Kos_' . Carbon::now()->format('M_Y') . '.pdf');
+    }
 }

@@ -30,22 +30,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
     
     // Route khusus Anak Kos (User Biasa)
-    Route::get('/user/tagihan', function () {
-        return redirect()->route('tagihan-saya.index');
-    });
-    Route::get('/tagihan-saya', [\App\Http\Controllers\User\TagihanSayaController::class, 'index'])->name('tagihan-saya.index');
+    Route::middleware(['is_penghuni'])->group(function () {
+        Route::get('/user/tagihan', function () {
+            return redirect()->route('tagihan-saya.index');
+        });
+        Route::get('/tagihan-saya', [\App\Http\Controllers\User\TagihanSayaController::class, 'index'])->name('tagihan-saya.index');
 
-    Route::get('/pilih-kamar', [\App\Http\Controllers\User\PilihKamarController::class, 'index'])->name('pilih-kamar.index');
-    Route::post('/pilih-kamar', [\App\Http\Controllers\User\PilihKamarController::class, 'store'])->name('pilih-kamar.store');
-    
-    // Komplain
-    Route::get('/user/komplain', [\App\Http\Controllers\User\KomplainController::class, 'index'])->name('user.komplain.index');
-    Route::post('/user/komplain', [\App\Http\Controllers\User\KomplainController::class, 'store'])->name('user.komplain.store');
-    Route::post('/user/komplain/{komplain}/rate', [\App\Http\Controllers\User\KomplainController::class, 'rate'])->name('user.komplain.rate');
-    
-    // Profile
-    Route::get('/profile', [\App\Http\Controllers\User\ProfileController::class, 'edit'])->name('user.profile.edit');
-    Route::post('/profile', [\App\Http\Controllers\User\ProfileController::class, 'update'])->name('user.profile.update');
+        Route::get('/pilih-kamar', [\App\Http\Controllers\User\PilihKamarController::class, 'index'])->name('pilih-kamar.index');
+        Route::post('/pilih-kamar', [\App\Http\Controllers\User\PilihKamarController::class, 'store'])->name('pilih-kamar.store');
+        
+        // Komplain
+        Route::get('/user/komplain', [\App\Http\Controllers\User\KomplainController::class, 'index'])->name('user.komplain.index');
+        Route::post('/user/komplain', [\App\Http\Controllers\User\KomplainController::class, 'store'])->name('user.komplain.store');
+        Route::post('/user/komplain/{komplain}/rate', [\App\Http\Controllers\User\KomplainController::class, 'rate'])->name('user.komplain.rate');
+        
+        // Profile
+        Route::get('/profile', [\App\Http\Controllers\User\ProfileController::class, 'edit'])->name('user.profile.edit');
+        Route::post('/profile', [\App\Http\Controllers\User\ProfileController::class, 'update'])->name('user.profile.update');
+    });
 });
 
 // Route Khusus ADMIN (Dilindungi middleware 'admin' yang baru kita buat)
@@ -83,6 +85,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 // Route Khusus PEMILIK (Dilindungi middleware 'pemilik')
 Route::middleware(['auth', 'pemilik'])->prefix('pemilik')->name('pemilik.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Pemilik\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/export-pdf', [\App\Http\Controllers\Pemilik\DashboardController::class, 'exportPdf'])->name('export.pdf');
     Route::get('/kamar', [\App\Http\Controllers\Pemilik\KamarController::class, 'index'])->name('kamar.index');
     Route::get('/penghuni', [\App\Http\Controllers\Pemilik\PenghuniController::class, 'index'])->name('penghuni.index');
     Route::get('/sewa', [\App\Http\Controllers\Pemilik\SewaController::class, 'index'])->name('sewa.index');

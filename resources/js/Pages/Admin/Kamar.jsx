@@ -97,7 +97,7 @@ export default function Kamar({ kamars = [] }) {
                     </div>
                     <button
                         onClick={openAddModal}
-                        className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 bg-[#8B5E3C] text-white rounded-xl font-semibold shadow-md shadow-[#8B5E3C]/20 hover:bg-[#6D462B] hover:shadow-lg transition-all duration-200"
+                        className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 bg-[#8B5E3C] dark:bg-slate-700 text-white rounded-xl font-semibold shadow-md shadow-[#8B5E3C]/20 dark:shadow-none dark:border dark:border-slate-600 hover:bg-[#6D462B] dark:hover:bg-slate-600 hover:shadow-lg transition-all duration-200"
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         Tambah Kamar

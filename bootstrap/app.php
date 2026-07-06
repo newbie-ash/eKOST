@@ -12,6 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         
+        $middleware->trustProxies(at: '*');
+
         // Middleware bawaan untuk Inertia/React
         $middleware->web(append: [
             \App\Http\Middleware\HandleInertiaRequests::class,
@@ -22,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\IsAdmin::class,
             'pemilik' => \App\Http\Middleware\IsPemilik::class,
+            'is_penghuni' => \App\Http\Middleware\IsPenghuni::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

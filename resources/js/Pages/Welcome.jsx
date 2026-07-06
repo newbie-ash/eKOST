@@ -128,7 +128,11 @@ export default function Welcome({ auth, kamars }) {
                                         <div key={kamar.id} className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl overflow-hidden shadow-lg border border-white/50 dark:border-slate-700/50 hover:shadow-2xl transition-all duration-300 group flex flex-col hover:-translate-y-1">
                                             <div className="relative h-48 bg-gray-200/50 dark:bg-slate-900/50 flex items-center justify-center overflow-hidden backdrop-blur-sm">
                                                 <div className="absolute inset-0 bg-[#8B5E3C]/5 dark:bg-black/10 group-hover:bg-transparent transition-colors z-10"></div>
-                                                <BedDouble className="w-16 h-16 text-gray-400 dark:text-gray-500 group-hover:scale-110 transition-transform duration-500" />
+                                                {kamar.galeri_foto && kamar.galeri_foto.length > 0 ? (
+                                                    <img src={`/storage/${kamar.galeri_foto[0]}`} alt={`Kamar ${kamar.nomor_kamar}`} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                ) : (
+                                                    <BedDouble className="w-16 h-16 text-gray-400 dark:text-gray-500 group-hover:scale-110 transition-transform duration-500" />
+                                                )}
                                                 <div className="absolute top-4 right-4 z-20">
                                                     <span className="bg-green-100/90 text-green-800 dark:bg-green-900/80 dark:text-green-300 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm backdrop-blur-md border border-green-200/50 dark:border-green-800/50">
                                                         Tersedia

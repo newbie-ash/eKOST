@@ -74,25 +74,31 @@ export default function PilihKamar({ kamars, punyaPengajuan }) {
                                 <div 
                                     key={kamar.id} 
                                     onClick={() => setSelectedKamar(kamar)}
-                                    className={`bg-white dark:bg-slate-800 border-2 rounded-2xl p-6 cursor-pointer transition-all ${
+                                    className={`bg-white dark:bg-slate-800 border-2 rounded-2xl overflow-hidden cursor-pointer transition-all flex flex-col ${
                                         selectedKamar?.id === kamar.id 
                                         ? 'border-amber-600 shadow-lg scale-[1.02]' 
                                         : 'border-transparent hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-md'
                                     }`}
                                 >
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="p-3 bg-amber-100 text-amber-700 rounded-xl">
-                                            <BedDouble className="w-6 h-6" />
+                                    <div className="relative h-48 bg-gray-100 dark:bg-slate-900 flex items-center justify-center border-b border-gray-100 dark:border-slate-700">
+                                        {kamar.galeri_foto && kamar.galeri_foto.length > 0 ? (
+                                            <img src={`/storage/${kamar.galeri_foto[0]}`} alt={`Kamar ${kamar.nomor_kamar}`} className="absolute inset-0 w-full h-full object-cover" />
+                                        ) : (
+                                            <BedDouble className="w-12 h-12 text-gray-400 dark:text-gray-600" />
+                                        )}
+                                        <div className="absolute top-4 right-4 z-10">
+                                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 shadow-sm">
+                                                Tersedia
+                                            </span>
                                         </div>
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Tersedia
-                                        </span>
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Kamar {kamar.nomor_kamar}</h3>
-                                    <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">Tipe: {kamar.tipe_kamar}</p>
-                                    
-                                    <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                                        Rp {numberFormat(kamar.harga)} <span className="text-sm font-normal text-gray-500 dark:text-slate-400">/ bulan</span>
+                                    <div className="p-6 flex-1 flex flex-col">
+                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">Kamar {kamar.nomor_kamar}</h3>
+                                        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">Tipe: {kamar.tipe_kamar}</p>
+                                        
+                                        <div className="text-lg font-semibold text-gray-900 dark:text-white mt-auto">
+                                            Rp {numberFormat(kamar.harga)} <span className="text-sm font-normal text-gray-500 dark:text-slate-400">/ bulan</span>
+                                        </div>
                                     </div>
                                 </div>
                             ))

@@ -1,7 +1,17 @@
 import { Head, Link } from '@inertiajs/react';
 import { BedDouble, CheckCircle2, MapPin, ShieldCheck, Sparkles, Wifi, Car, Banknote, Instagram, Facebook, MessageCircle } from 'lucide-react';
 import ThemeToggle from '@/Components/ThemeToggle';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
+// Fix Leaflet marker icon issue in React
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
+});
 export default function Welcome({ auth, kamars }) {
     const formatRupiah = (number) => {
         return new Intl.NumberFormat('id-ID', {
@@ -193,15 +203,33 @@ export default function Welcome({ auth, kamars }) {
                     <div id="lokasi" className="py-20 mt-auto">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                             <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-8 drop-shadow-sm">Lokasi Kami</h2>
-                            <div className="inline-flex flex-col sm:flex-row items-center gap-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl px-8 py-6 rounded-3xl shadow-xl border border-white/50 dark:border-slate-700/50 hover:-translate-y-1 transition-transform">
-                                <div className="p-4 bg-[#8B5E3C]/10 dark:bg-[#D4A373]/20 text-[#8B5E3C] dark:text-[#D4A373] rounded-full shadow-inner border border-[#8B5E3C]/20 dark:border-[#D4A373]/30">
-                                    <MapPin className="w-8 h-8" />
+                            
+                            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-4 rounded-3xl shadow-xl border border-white/50 dark:border-slate-700/50 overflow-hidden relative">
+                                <div className="h-[400px] w-full rounded-2xl overflow-hidden z-10 relative">
+                                    <MapContainer center={[5.1843, 97.1084]} zoom={15} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+                                        <TileLayer
+                                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        />
+                                        <Marker position={[5.1843, 97.1084]}>
+                                            <Popup>
+                                                <b>eKOS</b><br />
+                                                Kos Premium Lhokseumawe<br />
+                                                <span className="text-xs text-gray-500">Padang Sakti, Kec. Muara Satu</span>
+                                            </Popup>
+                                        </Marker>
+                                    </MapContainer>
                                 </div>
-                                <div className="text-center sm:text-left">
-                                    <span className="font-bold block text-gray-900 dark:text-white text-lg mb-1">Alamat Lengkap:</span>
-                                    <p className="text-gray-800 dark:text-gray-200 font-semibold">
-                                        Padang Sakti, Kec. Muara Satu, Kota Lhokseumawe, Aceh, Indonesia
-                                    </p>
+                                <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-left">
+                                    <div className="p-3 bg-[#8B5E3C]/10 dark:bg-[#D4A373]/20 text-[#8B5E3C] dark:text-[#D4A373] rounded-full shadow-inner border border-[#8B5E3C]/20 dark:border-[#D4A373]/30">
+                                        <MapPin className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <span className="font-bold block text-gray-900 dark:text-white text-base mb-1">Alamat Lengkap:</span>
+                                        <p className="text-gray-800 dark:text-gray-200 font-medium text-sm">
+                                            Padang Sakti, Kec. Muara Satu, Kota Lhokseumawe, Aceh, Indonesia
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

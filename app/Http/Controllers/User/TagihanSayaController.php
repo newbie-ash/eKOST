@@ -32,5 +32,28 @@ class TagihanSayaController extends Controller
         ]);
     }
 
+    public function kwitansi(Tagihan $tagihan)
+    {
+        // Pastikan tagihan ini milik user yang sedang login
+        $user = Auth::user();
+        $penyewa = Penyewa::where('user_id', $user->id)->first();
 
+        if (!$penyewa || $tagihan->sewa->penyewa_id !== $penyewa->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if (!$tagihan->status_lunas) {
+            abort(403, 'Tagihan belum lunas.');
+        }
+
+        $tagihan->load(['sewa.kamar', 'sewa.penyewa.user']);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('kwitansi-pdf', [
+            'tagihan' => $tagihan,
+            'kamar' => $tagihan->sewa->kamar,
+            'user' => $user,
+        ]);
+
+        return $pdf->download('Kwitansi_Pembayaran_' . $tagihan->bulan_tagihan . '.pdf');
+    }
 }

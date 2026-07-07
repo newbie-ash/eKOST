@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { Home, BedDouble, Users, ReceiptText, LogOut, Menu, Activity, Wrench, TrendingDown } from 'lucide-react';
 import ThemeToggle from '@/Components/ThemeToggle';
+import { Toaster } from 'sonner';
 
 export default function AdminLayout({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -28,6 +29,7 @@ export default function AdminLayout({ children }) {
 
     return (
         <div className="min-h-screen bg-[#FDFBF7] dark:bg-slate-900 text-[#4A3B32] dark:text-white font-sans flex overflow-hidden transition-colors">
+            <Toaster richColors position="top-right" />
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div 
@@ -90,7 +92,7 @@ export default function AdminLayout({ children }) {
                             className="flex items-center w-full px-4 py-3 text-[#7D6B5D] dark:text-white hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-700 dark:hover:text-red-400 rounded-xl transition-colors"
                         >
                             <LogOut className="w-5 h-5 mr-3" />
-                            Keluar
+                            Logout
                         </Link>
                     </div>
                 </div>

@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 import ThemeToggle from '@/Components/ThemeToggle';
+import { Toaster } from 'sonner';
 
 // Simple, Elegant Top Navbar Layout for Tenants
 export default function UserLayout({ children }) {
@@ -21,6 +22,7 @@ export default function UserLayout({ children }) {
 
     return (
         <div className="min-h-screen bg-cozy-cream-50 dark:bg-slate-900 text-cozy-brown-900 dark:text-white font-sans flex flex-col transition-colors duration-200">
+            <Toaster richColors position="top-right" />
             {/* Top Navigation Bar */}
             <header className="h-16 bg-white dark:bg-slate-800 border-b border-cozy-cream-200 dark:border-slate-700 shadow-sm z-30 sticky top-0 transition-colors duration-200">
                 <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -65,7 +67,7 @@ export default function UserLayout({ children }) {
                             href="/logout" 
                             as="button" 
                             className="p-2 hidden md:block text-cozy-brown-400 dark:text-slate-400 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition"
-                            title="Keluar Aplikasi"
+                            title="Logout"
                         >
                             <LogOut className="w-4 h-4" />
                         </Link>
@@ -107,7 +109,7 @@ export default function UserLayout({ children }) {
                                 onClick={() => setIsMobileMenuOpen(false)}
                                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                             >
-                                <LogOut className="w-5 h-5" /> Keluar Aplikasi
+                                <LogOut className="w-5 h-5" /> Logout
                             </Link>
                         </div>
                     </div>

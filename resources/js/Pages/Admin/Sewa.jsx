@@ -134,10 +134,10 @@ export default function Sewa({ sewas, kamars, penyewas }) {
                                         <td className="px-6 py-4 text-center">
                                             <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                                                 sewa.status_sewa === 'Aktif' 
-                                                    ? 'bg-green-100 text-green-800' 
+                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-400' 
                                                     : sewa.status_sewa === 'Menunggu Konfirmasi'
-                                                    ? 'bg-amber-100 text-amber-800'
-                                                    : 'bg-gray-100 text-gray-800 dark:text-white'
+                                                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-400'
+                                                    : 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-gray-300'
                                             }`}>
                                                 {sewa.status_sewa}
                                             </span>

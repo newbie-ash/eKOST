@@ -1,8 +1,9 @@
 import React from 'react';
 import { 
-    ReceiptText, CreditCard, LogOut, CheckCircle, Clock, MessageSquare, ExternalLink, Sparkles
+    ReceiptText, CreditCard, LogOut, CheckCircle, Clock, MessageSquare, ExternalLink, Sparkles, Download
 } from 'lucide-react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import axios from 'axios';
 
 import UserLayout from '@/Layouts/UserLayout';
 
@@ -24,6 +25,35 @@ export default function TagihanSaya({ tagihans = [], auth = {} }) {
         const roomNo = tagihan.sewa?.kamar?.nomor_kamar || '';
         const msg = `Halo Admin eKOS, saya ingin mengonfirmasi pembayaran kos untuk Kamar ${roomNo} bulan ${tagihan.bulan_tagihan} sebesar ${formatRupiah(tagihan.jumlah_bayar)}. Berikut terlampir bukti struk transfernya.`;
         return `https://wa.me/${adminPhone}?text=${encodeURIComponent(msg)}`;
+    };
+
+    const handlePayment = async (tagihan) => {
+        try {
+            const response = await axios.post(route('payment.snap-token', tagihan.id));
+            
+            if (response.data.snap_token) {
+                window.snap.pay(response.data.snap_token, {
+                    onSuccess: function(result){
+                        // Simulasi keberhasilan jika webhook terblokir localhost
+                        router.post(route('payment.simulate-success', tagihan.id));
+                    },
+                    onPending: function(result){
+                        console.log('pending', result);
+                    },
+                    onError: function(result){
+                        console.log('error', result);
+                    },
+                    onClose: function(){
+                        console.log('ditutup tanpa bayar');
+                    }
+                });
+            } else if (response.data.error) {
+                alert(response.data.error);
+            }
+        } catch (error) {
+            console.error("Gagal memulai pembayaran:", error);
+            alert("Terjadi kesalahan sistem saat menghubungi server pembayaran.");
+        }
     };
 
 
@@ -81,9 +111,16 @@ export default function TagihanSaya({ tagihans = [], auth = {} }) {
                                             <span className="text-lg font-extrabold text-cozy-brown-900 dark:text-white">{formatRupiah(tagihan.jumlah_bayar)}</span>
                                         </div>
 
-                                        {!tagihan.status_lunas && (
+                                        {!tagihan.status_lunas ? (
                                             <div className="flex gap-2">
 
+                                                <button 
+                                                    onClick={() => handlePayment(tagihan)}
+                                                    className="inline-flex items-center px-4 py-2 bg-cozy-brown-600 hover:bg-cozy-brown-700 text-white rounded-xl text-xs font-bold shadow-sm transition"
+                                                >
+                                                    <CreditCard className="w-4 h-4 mr-1.5" />
+                                                    Bayar Online
+                                                </button>
                                                 <a 
                                                     href={getConfirmWhatsAppUrl(tagihan)}
                                                     target="_blank"
@@ -91,7 +128,19 @@ export default function TagihanSaya({ tagihans = [], auth = {} }) {
                                                     className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-bold shadow-sm transition"
                                                 >
                                                     <MessageSquare className="w-4 h-4 mr-1.5" />
-                                                    Kirim Struk WA
+                                                    Konfirmasi WA
+                                                </a>
+                                            </div>
+                                        ) : (
+                                            <div className="flex gap-2">
+                                                <a 
+                                                    href={route('tagihan.kwitansi', tagihan.id)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-xl text-xs font-bold shadow-sm transition"
+                                                >
+                                                    <Download className="w-4 h-4 mr-1.5" />
+                                                    Download Kwitansi
                                                 </a>
                                             </div>
                                         )}
@@ -113,29 +162,23 @@ export default function TagihanSaya({ tagihans = [], auth = {} }) {
                         
                         <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-cozy-cream-200 dark:border-slate-700 shadow-sm space-y-4 transition-colors">
                             <div className="flex items-center gap-3 border-b border-cozy-cream-100 dark:border-slate-700 pb-3">
-                                <div className="bg-cozy-cream-100 dark:bg-slate-700 p-2 rounded-lg text-cozy-brown-500 dark:text-slate-200">
-                                    <ReceiptText className="w-5 h-5" />
+                                <div className="bg-blue-100 dark:bg-slate-700 p-2 rounded-lg text-blue-500 dark:text-blue-300">
+                                    <CreditCard className="w-5 h-5" />
                                 </div>
-                                <h4 className="font-bold text-cozy-brown-900 dark:text-white text-sm">Transfer Manual</h4>
+                                <h4 className="font-bold text-cozy-brown-900 dark:text-white text-sm">Pembayaran Online (Otomatis)</h4>
                             </div>
 
                             <div className="space-y-3 text-xs">
                                 <p className="text-cozy-brown-500 dark:text-slate-300">
-                                    Silakan lakukan pembayaran ke rekening berikut:
+                                    Sekarang eKOS mendukung pembayaran otomatis menggunakan QRIS, GoPay, dan Bank Transfer (Virtual Account).
                                 </p>
-                                <div className="bg-cozy-cream-50 dark:bg-slate-700/50 p-3 rounded-lg border border-cozy-cream-200 dark:border-slate-600">
-                                    <p className="font-bold text-cozy-brown-900 dark:text-white">BCA - 1234567890</p>
-                                    <p className="text-cozy-brown-600 dark:text-slate-400 mt-1">a.n. Admin eKOS</p>
-                                </div>
                             </div>
 
                             <div className="bg-cozy-cream-50 dark:bg-slate-700/50 p-3.5 rounded-xl border border-cozy-cream-200 dark:border-slate-700 text-[10px] text-cozy-brown-500 dark:text-slate-300 leading-relaxed">
-                                <span className="font-bold block mb-1">💡 Petunjuk Pembayaran:</span>
-                                1. Lakukan transfer sesuai dengan <b className="text-cozy-brown-900 dark:text-white">Total Pembayaran</b>.<br/>
-                                2. Simpan bukti transfer atau screenshot.<br/>
-                                3. Klik tombol <b className="text-green-600">Kirim Struk WA</b> pada tagihan di samping.<br/>
-                                4. Kirim bukti transfer tersebut melalui WhatsApp kepada Admin.<br/>
-                                5. Admin akan memverifikasi dan mengubah status menjadi <b>Lunas</b>.
+                                <span className="font-bold block mb-1">💡 Langkah Mudah:</span>
+                                1. Klik tombol <b className="text-cozy-brown-600 dark:text-white">Bayar Online</b> pada tagihan di samping.<br/>
+                                2. Pilih metode pembayaran yang Anda inginkan pada jendela yang muncul.<br/>
+                                3. Selesaikan pembayaran, dan status akan otomatis berubah menjadi <b className="text-green-600">Lunas</b>!
                             </div>
                         </div>
                     </div>

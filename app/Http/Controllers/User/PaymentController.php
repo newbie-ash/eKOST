@@ -1,0 +1,121 @@
+<?php
+
+namespace App\Http\Controllers\User;
+
+use App\Http\Controllers\Controller;
+use App\Models\Tagihan;
+use Illuminate\Http\Request;
+use Midtrans\Config;
+use Midtrans\Snap;
+use Midtrans\Notification;
+
+class PaymentController extends Controller
+{
+    public function __construct()
+    {
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$clientKey = config('midtrans.client_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = config('midtrans.is_sanitized');
+        Config::$is3ds = config('midtrans.is_3ds');
+    }
+
+    public function getSnapToken(Tagihan $tagihan)
+    {
+        // Security Check: IDOR Protection
+        $penyewa = \App\Models\Penyewa::where('user_id', auth()->id())->first();
+        if (!$penyewa || $tagihan->sewa->penyewa_id !== $penyewa->id) {
+            return response()->json(['error' => 'Unauthorized action.'], 403);
+        }
+
+        if ($tagihan->status_lunas) {
+            return response()->json(['error' => 'Tagihan sudah lunas']);
+        }
+
+        if ($tagihan->snap_token) {
+            return response()->json(['snap_token' => $tagihan->snap_token]);
+        }
+
+        // Buat params untuk Midtrans
+        $params = [
+            'transaction_details' => [
+                'order_id' => 'INV-' . $tagihan->id . '-' . time(),
+                'gross_amount' => $tagihan->jumlah_bayar,
+            ],
+            'customer_details' => [
+                'first_name' => auth()->user()->name,
+                'email' => auth()->user()->email,
+                'phone' => '',
+            ]
+        ];
+
+        // Bypass SSL error di localhost (Laragon/XAMPP)
+        // Mencegah bug Midtrans SDK saat merge array header
+        \Midtrans\Config::$curlOptions = [
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_HTTPHEADER => []
+        ];
+
+        try {
+            $snapToken = Snap::getSnapToken($params);
+            $tagihan->update(['snap_token' => $snapToken]);
+            return response()->json(['snap_token' => $snapToken]);
+        } catch (\Exception $e) {
+            \Log::error("Midtrans Error: " . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    // Hanya untuk simulasi sukses ketika presentasi/demo offline
+    public function simulateSuccess(Tagihan $tagihan)
+    {
+        // Security Check: IDOR Protection
+        $penyewa = \App\Models\Penyewa::where('user_id', auth()->id())->first();
+        if (!$penyewa || $tagihan->sewa->penyewa_id !== $penyewa->id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $tagihan->update(['status_lunas' => true]);
+        return redirect()->back()->with('message', 'Pembayaran Berhasil Disimulasikan');
+    }
+
+    public function webhook(Request $request)
+    {
+        try {
+            $notif = new Notification();
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+
+        $transaction = $notif->transaction_status;
+        $type = $notif->payment_type;
+        $order_id = $notif->order_id;
+        $fraud = $notif->fraud_status;
+
+        $tagihan_id = explode('-', $order_id)[1];
+        $tagihan = Tagihan::find($tagihan_id);
+
+        if (!$tagihan) {
+            return response()->json(['message' => 'Tagihan not found'], 404);
+        }
+
+        if ($transaction == 'capture') {
+            if ($type == 'credit_card') {
+                if ($fraud == 'challenge') {
+                    // challenge
+                } else {
+                    $tagihan->update(['status_lunas' => true]);
+                }
+            }
+        } else if ($transaction == 'settlement') {
+            $tagihan->update(['status_lunas' => true]);
+        } else if ($transaction == 'pending') {
+            // pending
+        } else if ($transaction == 'deny' || $transaction == 'expire' || $transaction == 'cancel') {
+            // cancel
+        }
+
+        return response()->json(['message' => 'Webhook received']);
+    }
+}

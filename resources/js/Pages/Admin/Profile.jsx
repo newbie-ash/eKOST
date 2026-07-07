@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { 
-    User, Lock, Save, AlertCircle, CheckCircle2
+    User, Lock, Save, AlertCircle, CheckCircle2, Eye, EyeOff
 } from 'lucide-react';
+import { toast } from 'sonner';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 
 export default function Profile({ auth, status }) {
     const user = auth.user;
+    const [showPassword, setShowPassword] = useState(false);
 
     const { 
         data: profileData, 
@@ -26,7 +28,7 @@ export default function Profile({ auth, status }) {
     const { 
         data: passwordData, 
         setData: setPasswordData, 
-        put: putPassword, 
+        post: postPassword, 
         errors: passwordErrors, 
         processing: passwordProcessing, 
         recentlySuccessful: passwordSuccessful,
@@ -49,9 +51,12 @@ export default function Profile({ auth, status }) {
         // Let's use the same URL but with a specific action or we can just use the defined route.
         // For simplicity, we can use the same route for both if we didn't specify a different route,
         // Wait, in our ProfileController we have updatePassword method.
-        postProfile(route(user.role === 'pemilik' ? 'pemilik.password.update' : 'admin.password.update'), {
+        postPassword(route(user.role === 'pemilik' ? 'pemilik.password.update' : 'admin.password.update'), {
             preserveScroll: true,
-            onSuccess: () => resetPassword(),
+            onSuccess: () => {
+                resetPassword();
+                toast.success('Password berhasil diperbarui!');
+            },
         });
     };
 
@@ -143,37 +148,64 @@ export default function Profile({ auth, status }) {
                     <form onSubmit={submitPassword} className="space-y-6 max-w-xl">
                         <div>
                             <InputLabel htmlFor="current_password" value="Password Saat Ini" className="text-gray-700 dark:text-gray-300" />
-                            <TextInput
-                                id="current_password"
-                                type="password"
-                                className="mt-1 block w-full bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-600 focus:border-[#8B5E3C] dark:focus:border-[#D4A373] focus:ring-[#8B5E3C] dark:focus:ring-[#D4A373] rounded-xl"
-                                value={passwordData.current_password}
-                                onChange={(e) => setPasswordData('current_password', e.target.value)}
-                            />
+                            <div className="relative mt-1">
+                                <TextInput
+                                    id="current_password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    className="block w-full pr-10 bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-600 focus:border-[#8B5E3C] dark:focus:border-[#D4A373] focus:ring-[#8B5E3C] dark:focus:ring-[#D4A373] rounded-xl"
+                                    value={passwordData.current_password}
+                                    onChange={(e) => setPasswordData('current_password', e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                            </div>
                             {passwordErrors.current_password && <p className="mt-2 text-sm text-red-600">{passwordErrors.current_password}</p>}
                         </div>
 
                         <div>
                             <InputLabel htmlFor="password" value="Password Baru" className="text-gray-700 dark:text-gray-300" />
-                            <TextInput
-                                id="password"
-                                type="password"
-                                className="mt-1 block w-full bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-600 focus:border-[#8B5E3C] dark:focus:border-[#D4A373] focus:ring-[#8B5E3C] dark:focus:ring-[#D4A373] rounded-xl"
-                                value={passwordData.password}
-                                onChange={(e) => setPasswordData('password', e.target.value)}
-                            />
+                            <div className="relative mt-1">
+                                <TextInput
+                                    id="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    className="block w-full pr-10 bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-600 focus:border-[#8B5E3C] dark:focus:border-[#D4A373] focus:ring-[#8B5E3C] dark:focus:ring-[#D4A373] rounded-xl"
+                                    value={passwordData.password}
+                                    onChange={(e) => setPasswordData('password', e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                            </div>
                             {passwordErrors.password && <p className="mt-2 text-sm text-red-600">{passwordErrors.password}</p>}
                         </div>
 
                         <div>
                             <InputLabel htmlFor="password_confirmation" value="Konfirmasi Password Baru" className="text-gray-700 dark:text-gray-300" />
-                            <TextInput
-                                id="password_confirmation"
-                                type="password"
-                                className="mt-1 block w-full bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-600 focus:border-[#8B5E3C] dark:focus:border-[#D4A373] focus:ring-[#8B5E3C] dark:focus:ring-[#D4A373] rounded-xl"
-                                value={passwordData.password_confirmation}
-                                onChange={(e) => setPasswordData('password_confirmation', e.target.value)}
-                            />
+                            <div className="relative mt-1">
+                                <TextInput
+                                    id="password_confirmation"
+                                    type={showPassword ? 'text' : 'password'}
+                                    className="block w-full pr-10 bg-gray-50 dark:bg-slate-900 border-gray-200 dark:border-slate-600 focus:border-[#8B5E3C] dark:focus:border-[#D4A373] focus:ring-[#8B5E3C] dark:focus:ring-[#D4A373] rounded-xl"
+                                    value={passwordData.password_confirmation}
+                                    onChange={(e) => setPasswordData('password_confirmation', e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                            </div>
                             {passwordErrors.password_confirmation && <p className="mt-2 text-sm text-red-600">{passwordErrors.password_confirmation}</p>}
                         </div>
 

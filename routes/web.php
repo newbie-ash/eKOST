@@ -13,6 +13,9 @@ Route::get('/', function () {
     ]);
 })->name('welcome');
 
+// Midtrans Webhook (Harus di luar middleware auth)
+Route::post('/midtrans/webhook', [\App\Http\Controllers\User\PaymentController::class, 'webhook'])->name('midtrans.webhook');
+
 Route::get('/kamar/{kamar}', function (\App\Models\Kamar $kamar) {
     return Inertia::render('KamarDetail', [
         'kamar' => $kamar,
@@ -35,9 +38,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return redirect()->route('tagihan-saya.index');
         });
         Route::get('/tagihan-saya', [\App\Http\Controllers\User\TagihanSayaController::class, 'index'])->name('tagihan-saya.index');
-
+        Route::get('/tagihan/{tagihan}/kwitansi', [\App\Http\Controllers\User\TagihanSayaController::class, 'kwitansi'])->name('tagihan.kwitansi');
         Route::get('/pilih-kamar', [\App\Http\Controllers\User\PilihKamarController::class, 'index'])->name('pilih-kamar.index');
         Route::post('/pilih-kamar', [\App\Http\Controllers\User\PilihKamarController::class, 'store'])->name('pilih-kamar.store');
+        
+        // Pembayaran Midtrans
+        Route::post('/tagihan/{tagihan}/snap-token', [\App\Http\Controllers\User\PaymentController::class, 'getSnapToken'])->name('payment.snap-token');
+        Route::post('/tagihan/{tagihan}/simulate-success', [\App\Http\Controllers\User\PaymentController::class, 'simulateSuccess'])->name('payment.simulate-success');
         
         // Komplain
         Route::get('/user/komplain', [\App\Http\Controllers\User\KomplainController::class, 'index'])->name('user.komplain.index');

@@ -4,6 +4,7 @@ import './bootstrap';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
+import GlobalLoader from './Components/GlobalLoader';
 
 const appName = import.meta.env.VITE_APP_NAME || 'eKOS';
 
@@ -29,7 +30,22 @@ createInertiaApp({
     },
     setup({ el, App, props }) {
         const root = createRoot(el);
-        root.render(<App {...props} />);
+        
+        // Hide initial splash screen after React mounts
+        const splash = document.getElementById('initial-splash');
+        if (splash) {
+            setTimeout(() => {
+                splash.style.opacity = '0';
+                setTimeout(() => splash.remove(), 500);
+            }, 100);
+        }
+
+        root.render(
+            <>
+                <App {...props} />
+                <GlobalLoader />
+            </>
+        );
     },
     progress: {
         color: '#8B5E3C',

@@ -19,10 +19,15 @@ export default function Profile() {
         nama_kontak_darurat: penyewa.nama_kontak_darurat || '',
         kontak_darurat: penyewa.kontak_darurat || '',
         foto_ktp: null,
+        foto_profil: null,
     });
 
     const [previewKtp, setPreviewKtp] = useState(
         penyewa.foto_ktp ? `/storage/${penyewa.foto_ktp}` : null
+    );
+
+    const [previewProfil, setPreviewProfil] = useState(
+        user.foto_profil ? `/storage/${user.foto_profil}` : null
     );
 
     const handleFileChange = (e) => {
@@ -30,6 +35,14 @@ export default function Profile() {
         if (file) {
             setData('foto_ktp', file);
             setPreviewKtp(URL.createObjectURL(file));
+        }
+    };
+
+    const handleProfilChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setData('foto_profil', file);
+            setPreviewProfil(URL.createObjectURL(file));
         }
     };
 
@@ -61,6 +74,26 @@ export default function Profile() {
                                 <UserCircle2 className="w-5 h-5 mr-2 text-cozy-brown-500" />
                                 Informasi Dasar
                             </h3>
+                            
+                            <div className="mb-8 flex items-center gap-6">
+                                <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 border-cozy-cream-200 dark:border-slate-600 bg-cozy-cream-50 dark:bg-slate-700 flex items-center justify-center shrink-0">
+                                    {previewProfil ? (
+                                        <img src={previewProfil} alt="Avatar" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <User className="w-8 h-8 text-cozy-brown-300" />
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="cursor-pointer inline-flex items-center px-4 py-2 bg-white dark:bg-slate-800 border border-cozy-cream-300 dark:border-slate-600 rounded-xl text-sm font-medium text-cozy-brown-700 dark:text-slate-200 hover:bg-cozy-cream-50 dark:hover:bg-slate-700 transition shadow-sm">
+                                        <Camera className="w-4 h-4 mr-2" />
+                                        Ganti Foto Profil
+                                        <input type="file" className="hidden" accept="image/*" onChange={handleProfilChange} />
+                                    </label>
+                                    <p className="text-xs text-cozy-brown-400 dark:text-slate-400 mt-2">Maks. 2MB (JPG, PNG)</p>
+                                    {errors.foto_profil && <p className="mt-1 text-sm text-red-600">{errors.foto_profil}</p>}
+                                </div>
+                            </div>
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-xs font-bold text-cozy-brown-400 dark:text-slate-400 uppercase tracking-wider mb-1">

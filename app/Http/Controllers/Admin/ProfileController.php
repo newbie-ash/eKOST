@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 
@@ -17,8 +17,8 @@ class ProfileController extends Controller
             'mustVerifyEmail' => false,
             'status' => session('status'),
             'auth' => [
-                'user' => $request->user()
-            ]
+                'user' => $request->user(),
+            ],
         ]);
     }
 
@@ -29,9 +29,20 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+            'foto_profil' => 'nullable|image|max:2048',
         ]);
 
-        $user->fill($validated);
+        $user->fill([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
+
+        if ($request->hasFile('foto_profil')) {
+            if ($user->foto_profil) {
+                Storage::disk('public')->delete($user->foto_profil);
+            }
+            $user->foto_profil = $request->file('foto_profil')->store('profiles', 'public');
+        }
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;

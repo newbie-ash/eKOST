@@ -7,30 +7,29 @@ use App\Models\Komplain;
 use App\Models\Sewa;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Storage;
 
 class KomplainController extends Controller
 {
     public function index(Request $request)
     {
         $user = $request->user();
-        
+
         // Pastikan user adalah penyewa
-        if (!$user->penyewa) {
+        if (! $user->penyewa) {
             return redirect()->route('pilih-kamar.index')->with('error', 'Anda harus menyewa kamar terlebih dahulu.');
         }
 
         // Ambil riwayat komplain user ini
         $komplains = Komplain::where('penyewa_id', $user->penyewa->id)
-                            ->with('kamar')
-                            ->latest()
-                            ->get();
+            ->with('kamar')
+            ->latest()
+            ->get();
 
         // Cek apakah user memiliki kamar aktif yang sedang disewa
         $sewaAktif = Sewa::where('penyewa_id', $user->penyewa->id)
-                         ->where('status_sewa', 'Aktif')
-                         ->with('kamar')
-                         ->first();
+            ->where('status_sewa', 'Aktif')
+            ->with('kamar')
+            ->first();
 
         return Inertia::render('User/Komplain', [
             'komplains' => $komplains,
@@ -41,8 +40,8 @@ class KomplainController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
-        
-        if (!$user->penyewa) {
+
+        if (! $user->penyewa) {
             return redirect()->back()->with('error', 'Akses ditolak.');
         }
 
@@ -73,8 +72,8 @@ class KomplainController extends Controller
     public function rate(Request $request, Komplain $komplain)
     {
         $user = $request->user();
-        
-        if (!$user->penyewa || $komplain->penyewa_id !== $user->penyewa->id) {
+
+        if (! $user->penyewa || $komplain->penyewa_id !== $user->penyewa->id) {
             return redirect()->back()->with('error', 'Akses ditolak.');
         }
 

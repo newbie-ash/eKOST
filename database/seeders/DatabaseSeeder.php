@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Penyewa;
 use App\Models\Kamar;
+use App\Models\Penyewa;
 use App\Models\Sewa;
 use App\Models\Tagihan;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
@@ -74,15 +74,15 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'penyewa',
             ]);
-            
+
             $penyewa = Penyewa::create([
                 'user_id' => $user->id,
                 'nomor_ktp' => $p['ktp'],
                 'pekerjaan' => $p['pekerjaan'],
                 'telepon' => $p['telepon'],
-                'kontak_darurat' => '08900000' . $index,
+                'kontak_darurat' => '08900000'.$index,
                 'jenis_kelamin' => $p['jk'],
-                'nama_kontak_darurat' => 'Keluarga ' . $p['nama'],
+                'nama_kontak_darurat' => 'Keluarga '.$p['nama'],
             ]);
             $penyewas[] = $penyewa;
         }

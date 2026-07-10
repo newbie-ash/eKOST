@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { 
-    User, Lock, Save, AlertCircle, CheckCircle2, Eye, EyeOff
+    User, Lock, Save, AlertCircle, CheckCircle2, Eye, EyeOff, Camera, Upload
 } from 'lucide-react';
 import { toast } from 'sonner';
 import TextInput from '@/Components/TextInput';
@@ -23,7 +23,20 @@ export default function Profile({ auth, status }) {
     } = useForm({
         name: user.name || '',
         email: user.email || '',
+        foto_profil: null,
     });
+
+    const [previewProfil, setPreviewProfil] = useState(
+        user.foto_profil ? `/storage/${user.foto_profil}` : null
+    );
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setProfileData('foto_profil', file);
+            setPreviewProfil(URL.createObjectURL(file));
+        }
+    };
 
     const { 
         data: passwordData, 
@@ -86,6 +99,26 @@ export default function Profile({ auth, status }) {
                     </div>
 
                     <form onSubmit={submitProfile} className="space-y-6">
+                        <div className="mb-6 flex items-center gap-6">
+                            <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-[#E8E0D5] dark:border-slate-600 bg-gray-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
+                                {previewProfil ? (
+                                    <img src={previewProfil} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    <User className="w-10 h-10 text-gray-400" />
+                                )}
+                            </div>
+                            <div>
+                                <InputLabel value="Foto Profil" className="mb-2" />
+                                <label className="cursor-pointer inline-flex items-center px-4 py-2 bg-white dark:bg-slate-800 border border-[#E8E0D5] dark:border-slate-600 rounded-xl text-sm font-medium text-[#7D6B5D] dark:text-slate-300 hover:bg-[#FAF6F0] dark:hover:bg-slate-700 transition shadow-sm">
+                                    <Camera className="w-4 h-4 mr-2" />
+                                    Ubah Foto
+                                    <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
+                                </label>
+                                <p className="text-xs text-gray-500 mt-2">Maks. 2MB (JPG, PNG)</p>
+                                {profileErrors.foto_profil && <p className="mt-1 text-sm text-red-600">{profileErrors.foto_profil}</p>}
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <InputLabel htmlFor="name" value="Nama Lengkap" className="text-gray-700 dark:text-gray-300" />

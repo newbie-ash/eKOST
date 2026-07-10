@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Tagihan;
+use Illuminate\Http\Request;
+use Midtrans\Config;
+use Midtrans\Notification;
 
 class WebhookController extends Controller
 {
     public function midtrans(Request $request)
     {
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
-        \Midtrans\Config::$isProduction = config('midtrans.is_production');
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
 
         try {
-            $notification = new \Midtrans\Notification();
+            $notification = new Notification;
         } catch (\Exception $e) {
             return response()->json(['message' => 'Invalid signature'], 403);
         }
@@ -25,7 +27,7 @@ class WebhookController extends Controller
 
         // format order_id: TAGIHAN-{id}-{time}
         $order_id_parts = explode('-', $order_id);
-        
+
         if (count($order_id_parts) >= 2 && $order_id_parts[0] === 'TAGIHAN') {
             $tagihan_id = $order_id_parts[1];
             $tagihan = Tagihan::find($tagihan_id);
@@ -39,9 +41,9 @@ class WebhookController extends Controller
                         $tagihan->status_lunas = true;
                         $tagihan->save();
                     }
-                } else if ($transaction == 'cancel' || $transaction == 'deny' || $transaction == 'expire') {
+                } elseif ($transaction == 'cancel' || $transaction == 'deny' || $transaction == 'expire') {
                     // failed/expired
-                } else if ($transaction == 'pending') {
+                } elseif ($transaction == 'pending') {
                     // pending
                 }
             }

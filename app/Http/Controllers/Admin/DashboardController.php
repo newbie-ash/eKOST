@@ -3,14 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\Kamar;
-use App\Models\Penyewa;
 use App\Models\Sewa;
 use App\Models\Tagihan;
-use App\Models\Komplain;
 use Carbon\Carbon;
+use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
@@ -27,7 +24,7 @@ class DashboardController extends Controller
         // Metrik Penghuni Aktif
         $totalPenghuni = Sewa::where('status_sewa', 'Aktif')->count();
 
-        $bulanString = $tahunIni . '-' . str_pad($bulanIni, 2, '0', STR_PAD_LEFT);
+        $bulanString = $tahunIni.'-'.str_pad($bulanIni, 2, '0', STR_PAD_LEFT);
 
         // Keuangan Bulan Ini
         $pemasukanBulanIni = Tagihan::where('status_lunas', true)
@@ -54,9 +51,9 @@ class DashboardController extends Controller
                 'totalPenghuni' => $totalPenghuni,
                 'pemasukanBulanIni' => $pemasukanBulanIni,
                 'tagihanMenunggak' => $tagihanMenunggak,
-                'sewaMenungguKonfirmasi' => $sewaMenungguKonfirmasi
+                'sewaMenungguKonfirmasi' => $sewaMenungguKonfirmasi,
             ],
-            'aktivitasTerbaru' => $aktivitasTerbaru
+            'aktivitasTerbaru' => $aktivitasTerbaru,
         ];
 
         if (auth()->user()->role === 'pemilik') {

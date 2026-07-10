@@ -1,8 +1,13 @@
 <?php
 
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\IsPemilik;
+use App\Http\Middleware\IsPenghuni;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -11,26 +16,26 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        
+
         $middleware->trustProxies(at: '*');
 
         // Middleware bawaan untuk Inertia/React
         $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
-            \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            HandleInertiaRequests::class,
+            AddLinkHeadersForPreloadedAssets::class,
         ]);
 
         // Daftarkan middleware dengan nama panggilan 'admin'
         $middleware->alias([
-            'admin' => \App\Http\Middleware\IsAdmin::class,
-            'pemilik' => \App\Http\Middleware\IsPemilik::class,
-            'is_penghuni' => \App\Http\Middleware\IsPenghuni::class,
+            'admin' => IsAdmin::class,
+            'pemilik' => IsPemilik::class,
+            'is_penghuni' => IsPenghuni::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [
             'midtrans/webhook',
         ]);
-        
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

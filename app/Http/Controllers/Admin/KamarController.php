@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Kamar;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,10 +17,10 @@ class KamarController extends Controller
     {
         // Ambil semua data kamar dari database, urutkan dari yang terbaru
         $kamars = Kamar::latest()->get();
-        
+
         // Kirim data ke tampilan React (Fase 4 nanti)
         return Inertia::render('Admin/Kamar', [
-            'kamars' => $kamars
+            'kamars' => $kamars,
         ]);
     }
 
@@ -53,11 +54,11 @@ class KamarController extends Controller
         // Simpan ke database secara otomatis dengan Eloquent ORM
         $kamar = Kamar::create($data);
 
-        \App\Models\ActivityLog::create([
+        ActivityLog::create([
             'user_id' => auth()->id(),
             'action' => 'tambah_kamar',
             'description' => "Menambahkan data kamar baru: Kamar {$request->nomor_kamar} ({$request->tipe_kamar})",
-            'details' => ['kamar_id' => $kamar->id]
+            'details' => ['kamar_id' => $kamar->id],
         ]);
 
         // Kembalikan halaman dengan pesan sukses
@@ -71,7 +72,7 @@ class KamarController extends Controller
     {
         // Validasi inputan
         $request->validate([
-            'nomor_kamar' => 'required|string|max:10|unique:kamars,nomor_kamar,' . $kamar->id,
+            'nomor_kamar' => 'required|string|max:10|unique:kamars,nomor_kamar,'.$kamar->id,
             'tipe_kamar' => 'required|string|max:50',
             'harga' => 'required|integer',
             'status' => 'required|string|max:20',
@@ -89,18 +90,18 @@ class KamarController extends Controller
                 $paths[] = $file->store('kamar_galeri', 'public');
             }
             $data['galeri_foto'] = $paths;
-            
+
             // Optionally delete old files here, but keeping it simple for now
         }
 
         // Update data yang dipilih
         $kamar->update($data);
 
-        \App\Models\ActivityLog::create([
+        ActivityLog::create([
             'user_id' => auth()->id(),
             'action' => 'edit_kamar',
             'description' => "Mengedit data Kamar {$request->nomor_kamar}",
-            'details' => ['kamar_id' => $kamar->id]
+            'details' => ['kamar_id' => $kamar->id],
         ]);
 
         return redirect()->back()->with('message', 'Data Kamar berhasil diperbarui!');
@@ -115,11 +116,11 @@ class KamarController extends Controller
         // Hapus data dari database
         $kamar->delete();
 
-        \App\Models\ActivityLog::create([
+        ActivityLog::create([
             'user_id' => auth()->id(),
             'action' => 'hapus_kamar',
             'description' => "Menghapus data Kamar {$nomor}",
-            'details' => ['kamar_id' => $kamar->id ?? null]
+            'details' => ['kamar_id' => $kamar->id ?? null],
         ]);
 
         return redirect()->back()->with('message', 'Kamar berhasil dihapus!');

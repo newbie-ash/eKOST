@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Pemilik;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Kamar;
+use App\Models\Pengeluaran;
 use App\Models\Penyewa;
 use App\Models\Tagihan;
-use App\Models\Pengeluaran;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
@@ -38,7 +39,7 @@ class DashboardController extends Controller
         $labaBersih = $pemasukanBulanIni - $pengeluaranBulanIni;
 
         // Ambil data aktivitas terbaru
-        $recentActivities = \App\Models\ActivityLog::with('user')
+        $recentActivities = ActivityLog::with('user')
             ->latest()
             ->take(5)
             ->get();
@@ -48,16 +49,16 @@ class DashboardController extends Controller
         for ($i = 5; $i >= 0; $i--) {
             $month = Carbon::now()->subMonths($i);
             $monthName = $month->translatedFormat('M Y');
-            
+
             $pemasukan = Tagihan::where('status_lunas', true)
                 ->whereMonth('created_at', $month->month)
                 ->whereYear('created_at', $month->year)
                 ->sum('jumlah_bayar');
-                
+
             $pengeluaran = Pengeluaran::whereMonth('tanggal', $month->month)
                 ->whereYear('tanggal', $month->year)
                 ->sum('jumlah');
-                
+
             $chartData[] = [
                 'name' => $monthName,
                 'Pemasukan' => (int) $pemasukan,
@@ -76,7 +77,7 @@ class DashboardController extends Controller
                 'laba_bersih' => $labaBersih,
             ],
             'recentActivities' => $recentActivities,
-            'chartData' => $chartData
+            'chartData' => $chartData,
         ]);
     }
 
@@ -99,7 +100,7 @@ class DashboardController extends Controller
         $totalPengeluaran = $pengeluaran->sum('jumlah');
         $labaBersih = $totalPemasukan - $totalPengeluaran;
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('laporan-keuangan', [
+        $pdf = Pdf::loadView('laporan-keuangan', [
             'pemasukan' => $pemasukan,
             'pengeluaran' => $pengeluaran,
             'totalPemasukan' => $totalPemasukan,
@@ -108,6 +109,6 @@ class DashboardController extends Controller
             'bulan' => Carbon::now()->translatedFormat('F Y'),
         ]);
 
-        return $pdf->download('Laporan_Keuangan_Kos_' . Carbon::now()->format('M_Y') . '.pdf');
+        return $pdf->download('Laporan_Keuangan_Kos_'.Carbon::now()->format('M_Y').'.pdf');
     }
 }

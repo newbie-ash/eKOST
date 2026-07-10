@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Penyewa;
 use App\Models\Tagihan;
 use Illuminate\Http\Request;
 use Midtrans\Config;
-use Midtrans\Snap;
 use Midtrans\Notification;
+use Midtrans\Snap;
 
 class PaymentController extends Controller
 {
@@ -23,8 +24,8 @@ class PaymentController extends Controller
     public function getSnapToken(Tagihan $tagihan)
     {
         // Security Check: IDOR Protection
-        $penyewa = \App\Models\Penyewa::where('user_id', auth()->id())->first();
-        if (!$penyewa || $tagihan->sewa->penyewa_id !== $penyewa->id) {
+        $penyewa = Penyewa::where('user_id', auth()->id())->first();
+        if (! $penyewa || $tagihan->sewa->penyewa_id !== $penyewa->id) {
             return response()->json(['error' => 'Unauthorized action.'], 403);
         }
 
@@ -39,30 +40,32 @@ class PaymentController extends Controller
         // Buat params untuk Midtrans
         $params = [
             'transaction_details' => [
-                'order_id' => 'INV-' . $tagihan->id . '-' . time(),
+                'order_id' => 'INV-'.$tagihan->id.'-'.time(),
                 'gross_amount' => $tagihan->jumlah_bayar,
             ],
             'customer_details' => [
                 'first_name' => auth()->user()->name,
                 'email' => auth()->user()->email,
                 'phone' => '',
-            ]
+            ],
         ];
 
         // Bypass SSL error di localhost (Laragon/XAMPP)
         // Mencegah bug Midtrans SDK saat merge array header
-        \Midtrans\Config::$curlOptions = [
+        Config::$curlOptions = [
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSL_VERIFYPEER => 0,
-            CURLOPT_HTTPHEADER => []
+            CURLOPT_HTTPHEADER => [],
         ];
 
         try {
             $snapToken = Snap::getSnapToken($params);
             $tagihan->update(['snap_token' => $snapToken]);
+
             return response()->json(['snap_token' => $snapToken]);
         } catch (\Exception $e) {
-            \Log::error("Midtrans Error: " . $e->getMessage());
+            \Log::error('Midtrans Error: '.$e->getMessage());
+
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -71,19 +74,20 @@ class PaymentController extends Controller
     public function simulateSuccess(Tagihan $tagihan)
     {
         // Security Check: IDOR Protection
-        $penyewa = \App\Models\Penyewa::where('user_id', auth()->id())->first();
-        if (!$penyewa || $tagihan->sewa->penyewa_id !== $penyewa->id) {
+        $penyewa = Penyewa::where('user_id', auth()->id())->first();
+        if (! $penyewa || $tagihan->sewa->penyewa_id !== $penyewa->id) {
             abort(403, 'Unauthorized action.');
         }
 
         $tagihan->update(['status_lunas' => true]);
+
         return redirect()->back()->with('message', 'Pembayaran Berhasil Disimulasikan');
     }
 
     public function webhook(Request $request)
     {
         try {
-            $notif = new Notification();
+            $notif = new Notification;
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -96,7 +100,7 @@ class PaymentController extends Controller
         $tagihan_id = explode('-', $order_id)[1];
         $tagihan = Tagihan::find($tagihan_id);
 
-        if (!$tagihan) {
+        if (! $tagihan) {
             return response()->json(['message' => 'Tagihan not found'], 404);
         }
 
@@ -108,11 +112,11 @@ class PaymentController extends Controller
                     $tagihan->update(['status_lunas' => true]);
                 }
             }
-        } else if ($transaction == 'settlement') {
+        } elseif ($transaction == 'settlement') {
             $tagihan->update(['status_lunas' => true]);
-        } else if ($transaction == 'pending') {
+        } elseif ($transaction == 'pending') {
             // pending
-        } else if ($transaction == 'deny' || $transaction == 'expire' || $transaction == 'cancel') {
+        } elseif ($transaction == 'deny' || $transaction == 'expire' || $transaction == 'cancel') {
             // cancel
         }
 

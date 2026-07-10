@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Kamar;
+use Illuminate\Database\Seeder;
 
 class KamarSeeder extends Seeder
 {

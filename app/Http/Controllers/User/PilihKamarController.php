@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\Kamar;
-use App\Models\Sewa;
 use App\Models\Penyewa;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Sewa;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class PilihKamarController extends Controller
 {
@@ -31,7 +31,7 @@ class PilihKamarController extends Controller
 
         return Inertia::render('User/PilihKamar', [
             'kamars' => $kamars,
-            'punyaPengajuan' => $punyaPengajuan
+            'punyaPengajuan' => $punyaPengajuan,
         ]);
     }
 
@@ -40,11 +40,11 @@ class PilihKamarController extends Controller
         $request->validate([
             'kamar_id' => 'required|exists:kamars,id',
             'durasi_bulan' => 'required|integer|min:1',
-            'tanggal_masuk' => 'required|date'
+            'tanggal_masuk' => 'required|date',
         ]);
 
         $user = Auth::user();
-        
+
         // Buat data penyewa otomatis jika belum ada (misal dia baru daftar)
         $penyewa = Penyewa::firstOrCreate(
             ['user_id' => $user->id]
@@ -52,8 +52,8 @@ class PilihKamarController extends Controller
 
         // Pastikan tidak ada pengajuan ganda
         $adaPengajuan = Sewa::where('penyewa_id', $penyewa->id)
-                ->where('status_sewa', 'Menunggu Konfirmasi')
-                ->exists();
+            ->where('status_sewa', 'Menunggu Konfirmasi')
+            ->exists();
 
         if ($adaPengajuan) {
             return redirect()->back()->with('error', 'Anda sudah memiliki pengajuan sewa yang sedang diproses.');
@@ -62,7 +62,7 @@ class PilihKamarController extends Controller
         // Cek kembali status kamar (race condition prevention)
         $kamar = Kamar::findOrFail($request->kamar_id);
         if ($kamar->status !== 'kosong') {
-             return redirect()->back()->with('error', 'Maaf, kamar tersebut baru saja dipesan oleh orang lain.');
+            return redirect()->back()->with('error', 'Maaf, kamar tersebut baru saja dipesan oleh orang lain.');
         }
 
         // Hitung tanggal keluar

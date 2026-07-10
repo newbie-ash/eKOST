@@ -74,17 +74,7 @@ export default function AdminLayout({ children }) {
 
                     {/* Footer Actions */}
                     <div className="p-4 border-t border-[#E8E0D5] dark:border-slate-700 space-y-2">
-                        <Link 
-                            href={role === 'pemilik' ? '/pemilik/profile' : '/admin/profile'}
-                            className={`flex items-center w-full px-4 py-3 rounded-xl transition-all duration-200 ${
-                                url?.includes('/profile') 
-                                ? 'bg-[#F5F0E6] dark:bg-slate-700 text-[#8B5E3C] dark:text-white font-semibold shadow-sm' 
-                                : 'text-[#7D6B5D] dark:text-white hover:bg-[#FAF6F0] dark:hover:bg-slate-700 hover:text-[#8B5E3C] dark:hover:text-white'
-                            }`}
-                        >
-                            <Users className="w-5 h-5 mr-3" />
-                            Pengaturan Akun
-                        </Link>
+
                         <Link 
                             method="post" 
                             href="/logout" 
@@ -115,9 +105,16 @@ export default function AdminLayout({ children }) {
                         <span className="text-sm font-medium text-[#7D6B5D] dark:text-white hidden sm:block">
                             Halo, {auth?.user?.name || (role === 'pemilik' ? 'Juragan' : 'Admin')}
                         </span>
-                        <div className="w-9 h-9 rounded-full bg-[#8B5E3C] text-cozy-cream-100 flex items-center justify-center font-bold shadow-sm">
-                            {auth?.user?.name ? auth.user.name.charAt(0).toUpperCase() : (role === 'pemilik' ? 'J' : 'A')}
-                        </div>
+                        <Link 
+                            href={role === 'pemilik' ? '/pemilik/profile' : '/admin/profile'}
+                            className="w-9 h-9 rounded-full bg-[#8B5E3C] text-[#FDFBF7] flex items-center justify-center font-bold shadow-sm hover:ring-2 hover:ring-[#8B5E3C] transition-all cursor-pointer overflow-hidden"
+                        >
+                            {auth?.user?.foto_profil ? (
+                                <img src={`/storage/${auth.user.foto_profil}`} alt="Avatar" className="w-full h-full object-cover" />
+                            ) : (
+                                auth?.user?.name ? auth.user.name.charAt(0).toUpperCase() : (role === 'pemilik' ? 'J' : 'A')
+                            )}
+                        </Link>
                     </div>
                 </header>
 

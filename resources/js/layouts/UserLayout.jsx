@@ -17,7 +17,6 @@ export default function UserLayout({ children }) {
         { name: 'Tagihan Saya', href: '/tagihan-saya', icon: ReceiptText },
         { name: 'Pilih Kamar', href: '/pilih-kamar', icon: BedDouble },
         { name: 'Laporan Kerusakan', href: '/user/komplain', icon: Wrench },
-        { name: 'Profil Saya', href: '/profile', icon: UserCircle2 },
     ];
 
     return (
@@ -56,9 +55,16 @@ export default function UserLayout({ children }) {
                         <ThemeToggle />
                         <div className="flex items-center gap-2">
                             <span className="text-xs sm:text-sm font-semibold text-cozy-brown-800 dark:text-slate-200 hidden sm:block">{userName || 'Penghuni Kos'}</span>
-                            <div className="w-8 h-8 rounded-full bg-cozy-brown-500 dark:bg-cozy-brown-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
-                                {userName ? userName.charAt(0).toUpperCase() : 'U'}
-                            </div>
+                            <Link 
+                                href="/profile"
+                                className="w-8 h-8 rounded-full bg-cozy-brown-500 dark:bg-cozy-brown-600 text-white flex items-center justify-center font-bold text-sm shadow-sm hover:ring-2 hover:ring-cozy-brown-500 transition-all cursor-pointer overflow-hidden"
+                            >
+                                {auth?.user?.foto_profil ? (
+                                    <img src={`/storage/${auth.user.foto_profil}`} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    userName ? userName.charAt(0).toUpperCase() : 'U'
+                                )}
+                            </Link>
                         </div>
                         
                         {/* Logout Desktop */}

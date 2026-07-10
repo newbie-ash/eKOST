@@ -17,8 +17,8 @@ class ProfileController extends Controller
 
         return Inertia::render('User/Profile', [
             'auth' => [
-                'user' => $user
-            ]
+                'user' => $user,
+            ],
         ]);
     }
 
@@ -36,6 +36,7 @@ class ProfileController extends Controller
             'nama_kontak_darurat' => 'nullable|string|max:255',
             'kontak_darurat' => 'nullable|string|max:20',
             'foto_ktp' => 'nullable|image|max:2048', // max 2MB
+            'foto_profil' => 'nullable|image|max:2048', // max 2MB
         ]);
 
         // Jika email berubah, set email_verified_at menjadi null (opsional)
@@ -44,10 +45,17 @@ class ProfileController extends Controller
         }
 
         // Update nama user dan email
-        $user->update([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-        ]);
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+
+        if ($request->hasFile('foto_profil')) {
+            if ($user->foto_profil) {
+                Storage::disk('public')->delete($user->foto_profil);
+            }
+            $user->foto_profil = $request->file('foto_profil')->store('profiles', 'public');
+        }
+
+        $user->save();
 
         // Handle foto_ktp upload
         $foto_ktp_path = $user->penyewa->foto_ktp ?? null;

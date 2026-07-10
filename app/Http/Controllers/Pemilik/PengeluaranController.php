@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Pemilik;
 
 use App\Http\Controllers\Controller;
-use App\Models\Pengeluaran;
+use App\Models\ActivityLog;
 use App\Models\Kamar;
+use App\Models\Pengeluaran;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -17,7 +18,7 @@ class PengeluaranController extends Controller
 
         return Inertia::render('Pemilik/Pengeluaran', [
             'pengeluarans' => $pengeluarans,
-            'kamars' => $kamars
+            'kamars' => $kamars,
         ]);
     }
 
@@ -28,16 +29,16 @@ class PengeluaranController extends Controller
             'kategori' => 'required|string',
             'jumlah' => 'required|integer|min:0',
             'keterangan' => 'nullable|string',
-            'kamar_id' => 'nullable|exists:kamars,id'
+            'kamar_id' => 'nullable|exists:kamars,id',
         ]);
 
         $pengeluaran = Pengeluaran::create($request->all());
 
-        \App\Models\ActivityLog::create([
+        ActivityLog::create([
             'user_id' => auth()->id(),
             'action' => 'buat_pengeluaran',
-            'description' => "Mencatat pengeluaran baru: {$request->kategori} sebesar Rp " . number_format($request->jumlah, 0, ',', '.'),
-            'details' => ['pengeluaran_id' => $pengeluaran->id]
+            'description' => "Mencatat pengeluaran baru: {$request->kategori} sebesar Rp ".number_format($request->jumlah, 0, ',', '.'),
+            'details' => ['pengeluaran_id' => $pengeluaran->id],
         ]);
 
         return redirect()->back()->with('message', 'Catatan pengeluaran berhasil ditambahkan!');
@@ -47,11 +48,11 @@ class PengeluaranController extends Controller
     {
         $pengeluaran->delete();
 
-        \App\Models\ActivityLog::create([
+        ActivityLog::create([
             'user_id' => auth()->id(),
             'action' => 'hapus_pengeluaran',
             'description' => "Menghapus data pengeluaran: {$pengeluaran->kategori}",
-            'details' => ['pengeluaran_id' => $pengeluaran->id]
+            'details' => ['pengeluaran_id' => $pengeluaran->id],
         ]);
 
         return redirect()->back()->with('message', 'Catatan pengeluaran berhasil dihapus!');

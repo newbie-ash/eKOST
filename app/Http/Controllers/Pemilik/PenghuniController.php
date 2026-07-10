@@ -11,9 +11,9 @@ class PenghuniController extends Controller
     public function index()
     {
         $penghunis = Penyewa::with('user')->latest()->get();
-        
+
         return Inertia::render('Pemilik/Penghuni', [
-            'penghunis' => $penghunis
+            'penghunis' => $penghunis,
         ]);
     }
 }

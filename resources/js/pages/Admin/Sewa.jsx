@@ -1,10 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
 export default function Sewa({ sewas, kamars, penyewas }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('aktif');
+    const [localSewas, setLocalSewas] = useState(sewas);
+
+    useEffect(() => {
+        setLocalSewas(sewas);
+    }, [sewas]);
+
+    useEffect(() => {
+        if (window.Echo) {
+            window.Echo.channel('orders')
+                .listen('SewaCreated', (e) => {
+                    setLocalSewas((prev) => {
+                        const exists = prev.find(s => s.id === e.sewa.id);
+                        if (exists) {
+                            return prev.map(s => s.id === e.sewa.id ? {...s, ...e.sewa} : s);
+                        }
+                        return [e.sewa, ...prev];
+                    });
+                });
+        }
+    }, []);
     const { data, setData, post, processing, errors, reset } = useForm({
         nama_penyewa: '',
         kamar_id: '',
@@ -12,8 +32,8 @@ export default function Sewa({ sewas, kamars, penyewas }) {
         durasi_bulan: 1,
     });
 
-    const sewaMenunggu = sewas.filter(s => s.status_sewa === 'Menunggu Konfirmasi');
-    const sewaAktif = sewas.filter(s => s.status_sewa !== 'Menunggu Konfirmasi');
+    const sewaMenunggu = localSewas.filter(s => s.status_sewa === 'Menunggu Konfirmasi');
+    const sewaAktif = localSewas.filter(s => s.status_sewa !== 'Menunggu Konfirmasi');
 
     const submit = (e) => {
         e.preventDefault();

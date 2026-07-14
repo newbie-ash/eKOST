@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
-    ReceiptText, LogOut, BedDouble, UserCircle2, Wrench, Menu, X
+    ReceiptText, LogOut, BedDouble, Wrench
 } from 'lucide-react';
 import { Link, usePage } from '@inertiajs/react';
 import ThemeToggle from '@/Components/ThemeToggle';
 import { Toaster } from 'sonner';
 
-// Simple, Elegant Top Navbar Layout for Tenants
+// Mobile-First, Elegant Navbar Layout for Tenants
 export default function UserLayout({ children }) {
     const { url } = usePage();
     const { auth } = usePage().props;
     const userName = auth?.user?.name;
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const navLinks = [
-        { name: 'Tagihan Saya', href: '/tagihan-saya', icon: ReceiptText },
-        { name: 'Pilih Kamar', href: '/pilih-kamar', icon: BedDouble },
-        { name: 'Laporan Kerusakan', href: '/user/komplain', icon: Wrench },
+        { name: 'Tagihan', href: '/tagihan-saya', icon: ReceiptText },
+        { name: 'Kamar', href: '/pilih-kamar', icon: BedDouble },
+        { name: 'Komplain', href: '/user/komplain', icon: Wrench },
     ];
 
     return (
         <div className="min-h-screen bg-cozy-cream-50 dark:bg-slate-900 text-cozy-brown-900 dark:text-white font-sans flex flex-col transition-colors duration-200">
             <Toaster richColors position="top-right" />
-            {/* Top Navigation Bar */}
+            
+            {/* Top Navigation Bar (Desktop & Mobile Header) */}
             <header className="h-16 bg-white dark:bg-slate-800 border-b border-cozy-cream-200 dark:border-slate-700 shadow-sm z-30 sticky top-0 transition-colors duration-200">
                 <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -37,7 +37,7 @@ export default function UserLayout({ children }) {
                                 <Link 
                                     key={link.name}
                                     href={link.href} 
-                                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors active:scale-95 ${
                                         url?.startsWith(link.href) 
                                         ? 'bg-cozy-brown-100 dark:bg-slate-700 text-cozy-brown-900 dark:text-white' 
                                         : 'text-cozy-brown-600 dark:text-slate-300 hover:bg-cozy-cream-100 dark:hover:bg-slate-700 hover:text-cozy-brown-900 dark:hover:text-white'
@@ -57,7 +57,7 @@ export default function UserLayout({ children }) {
                             <span className="text-xs sm:text-sm font-semibold text-cozy-brown-800 dark:text-slate-200 hidden sm:block">{userName || 'Penghuni Kos'}</span>
                             <Link 
                                 href="/profile"
-                                className="w-8 h-8 rounded-full bg-cozy-brown-500 dark:bg-cozy-brown-600 text-white flex items-center justify-center font-bold text-sm shadow-sm hover:ring-2 hover:ring-cozy-brown-500 transition-all cursor-pointer overflow-hidden"
+                                className="w-8 h-8 rounded-full bg-cozy-brown-500 dark:bg-cozy-brown-600 text-white flex items-center justify-center font-bold text-sm shadow-sm hover:ring-2 hover:ring-cozy-brown-500 active:scale-95 transition-all cursor-pointer overflow-hidden"
                             >
                                 {auth?.user?.foto_profil ? (
                                     <img src={`/storage/${auth.user.foto_profil}`} alt="Avatar" className="w-full h-full object-cover" />
@@ -72,60 +72,60 @@ export default function UserLayout({ children }) {
                             method="post" 
                             href="/logout" 
                             as="button" 
-                            className="p-2 hidden md:block text-cozy-brown-400 dark:text-slate-400 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition"
+                            className="p-2 hidden md:block text-cozy-brown-400 dark:text-slate-400 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg active:scale-95 transition"
                             title="Logout"
                         >
                             <LogOut className="w-4 h-4" />
                         </Link>
-
-                        {/* Hamburger Button (Mobile) */}
-                        <button 
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="p-2 md:hidden text-cozy-brown-600 dark:text-slate-300 hover:bg-cozy-cream-100 dark:hover:bg-slate-700 rounded-lg transition"
-                        >
-                            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                        </button>
                     </div>
                 </div>
-
-                {/* Mobile Navigation Dropdown */}
-                {isMobileMenuOpen && (
-                    <div className="md:hidden absolute w-full left-0 top-16 bg-white dark:bg-slate-800 border-b border-cozy-cream-200 dark:border-slate-700 shadow-lg px-4 py-4 space-y-2 z-40">
-                        {navLinks.map((link) => (
-                            <Link 
-                                key={link.name}
-                                href={link.href} 
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className={`block px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                                    url?.startsWith(link.href) 
-                                    ? 'bg-cozy-brown-100 dark:bg-slate-700 text-cozy-brown-900 dark:text-white' 
-                                    : 'text-cozy-brown-600 dark:text-slate-300 hover:bg-cozy-cream-50 dark:hover:bg-slate-700/50'
-                                }`}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <link.icon className="w-5 h-5" /> {link.name}
-                                </div>
-                            </Link>
-                        ))}
-                        <div className="pt-2 mt-2 border-t border-cozy-cream-100 dark:border-slate-700">
-                            <Link 
-                                method="post" 
-                                href="/logout" 
-                                as="button" 
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                            >
-                                <LogOut className="w-5 h-5" /> Logout
-                            </Link>
-                        </div>
-                    </div>
-                )}
             </header>
 
-            {/* Main Page Content */}
-            <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+            {/* Main Page Content - Added pb-24 for mobile bottom nav spacing */}
+            <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
                 {children}
             </main>
+
+            {/* Bottom Navigation for Mobile */}
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-cozy-cream-200 dark:border-slate-700 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-40 pb-safe">
+                <div className="flex justify-around items-center h-16">
+                    {navLinks.map((link) => {
+                        const isActive = url?.startsWith(link.href);
+                        return (
+                            <Link 
+                                key={link.name}
+                                href={link.href}
+                                className={`flex flex-col items-center justify-center w-full h-full space-y-1 active:scale-95 transition-transform ${
+                                    isActive 
+                                    ? 'text-cozy-brown-600 dark:text-orange-400' 
+                                    : 'text-gray-500 dark:text-slate-400'
+                                }`}
+                            >
+                                <div className={`p-1 rounded-full ${isActive ? 'bg-cozy-brown-50 dark:bg-slate-700' : ''}`}>
+                                    <link.icon className={`w-6 h-6 ${isActive ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+                                </div>
+                                <span className={`text-[10px] ${isActive ? 'font-bold' : 'font-medium'}`}>
+                                    {link.name}
+                                </span>
+                            </Link>
+                        );
+                    })}
+                    {/* Logout Button on Mobile Nav */}
+                    <Link 
+                        method="post" 
+                        href="/logout"
+                        as="button"
+                        className="flex flex-col items-center justify-center w-full h-full space-y-1 text-gray-500 dark:text-slate-400 active:scale-95 transition-transform"
+                    >
+                        <div className="p-1 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500">
+                            <LogOut className="w-6 h-6 stroke-2" />
+                        </div>
+                        <span className="text-[10px] font-medium">
+                            Logout
+                        </span>
+                    </Link>
+                </div>
+            </nav>
         </div>
     );
 }

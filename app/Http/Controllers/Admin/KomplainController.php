@@ -29,6 +29,9 @@ class KomplainController extends Controller
             'status' => $request->status,
         ]);
 
+        $komplain->load(['penyewa.user', 'kamar']);
+        event(new \App\Events\MessageSent($komplain));
+
         ActivityLog::create([
             'user_id' => auth()->id(),
             'action' => 'update_komplain',

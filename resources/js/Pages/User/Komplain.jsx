@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, useForm, usePage, router } from '@inertiajs/react';
 import UserLayout from '@/Layouts/UserLayout';
 import { Wrench, Image as ImageIcon, CheckCircle2, Clock, PlayCircle, AlertCircle, Trash2, Star, X } from 'lucide-react';
@@ -8,6 +8,26 @@ export default function Komplain({ komplains, kamarAktif }) {
     const [previewFoto, setPreviewFoto] = useState(null);
     const [ratingModalOpen, setRatingModalOpen] = useState(false);
     const [selectedKomplain, setSelectedKomplain] = useState(null);
+    const [localKomplains, setLocalKomplains] = useState(komplains);
+
+    useEffect(() => {
+        setLocalKomplains(komplains);
+    }, [komplains]);
+
+    useEffect(() => {
+        if (window.Echo) {
+            window.Echo.channel('chat')
+                .listen('MessageSent', (e) => {
+                    setLocalKomplains((prev) => {
+                        const exists = prev.find(k => k.id === e.message.id);
+                        if (exists) {
+                            return prev.map(k => k.id === e.message.id ? {...k, ...e.message} : k);
+                        }
+                        return [e.message, ...prev];
+                    });
+                });
+        }
+    }, []);
 
     const { data, setData, post, processing, errors, reset, progress } = useForm({
         kamar_id: kamarAktif ? kamarAktif.id : '',
@@ -131,12 +151,12 @@ export default function Komplain({ komplains, kamarAktif }) {
                     {/* Form Laporan */}
                     <div className="lg:col-span-1">
                         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
-                            <div className="p-5 border-b border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50">
+                            <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50">
                                 <h3 className="font-bold text-gray-900 dark:text-white">Buat Laporan Baru</h3>
                             </div>
                             
                             {kamarAktif ? (
-                                <form onSubmit={submit} className="p-5 space-y-4">
+                                <form onSubmit={submit} className="p-4 sm:p-5 space-y-4">
                                     {/* Inputs sama seperti sebelumnya */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kamar Saat Ini</label>
@@ -158,7 +178,7 @@ export default function Komplain({ komplains, kamarAktif }) {
                                             <div className="relative rounded-xl overflow-hidden border border-gray-200 dark:border-slate-600 group">
                                                 <img src={previewFoto} alt="Preview" className="w-full h-40 object-cover" />
                                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <button type="button" onClick={() => { setData('foto_kerusakan', null); setPreviewFoto(null); }} className="text-white bg-red-600 p-2 rounded-full hover:bg-red-700 transition">
+                                                    <button type="button" onClick={() => { setData('foto_kerusakan', null); setPreviewFoto(null); }} className="text-white bg-red-600 p-2 rounded-full hover:bg-red-700 transition active:scale-95">
                                                         <Trash2 className="w-5 h-5" />
                                                     </button>
                                                 </div>
@@ -178,7 +198,7 @@ export default function Komplain({ komplains, kamarAktif }) {
                                         )}
                                         {errors.foto_kerusakan && <p className="text-red-500 text-xs mt-1">{errors.foto_kerusakan}</p>}
                                     </div>
-                                    <button type="submit" disabled={processing} className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-4 rounded-xl transition-colors disabled:opacity-50">
+                                    <button type="submit" disabled={processing} className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 px-4 rounded-xl transition-all active:scale-95 shadow-sm disabled:opacity-50">
                                         {processing ? 'Mengirim...' : 'Kirim Laporan'}
                                     </button>
                                 </form>
@@ -191,19 +211,19 @@ export default function Komplain({ komplains, kamarAktif }) {
                     {/* Riwayat Komplain dengan Timeline */}
                     <div className="lg:col-span-2">
                         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
-                            <div className="p-5 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center">
+                            <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center">
                                 <h3 className="font-bold text-gray-900 dark:text-white">Riwayat Pelacakan Laporan</h3>
                             </div>
                             
-                            <div className="p-5">
-                                {komplains.length > 0 ? (
+                            <div className="p-4 sm:p-5">
+                                {localKomplains.length > 0 ? (
                                     <div className="space-y-6">
-                                        {komplains.map(komplain => (
-                                            <div key={komplain.id} className="border border-gray-200 dark:border-slate-700 rounded-2xl p-5 hover:shadow-md transition-shadow relative">
+                                        {localKomplains.map(komplain => (
+                                            <div key={komplain.id} className="border border-gray-200 dark:border-slate-700 rounded-2xl p-4 sm:p-5 hover:shadow-md transition-shadow relative">
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div>
-                                                        <h4 className="font-bold text-gray-900 dark:text-white text-xl">{komplain.judul_komplain}</h4>
-                                                        <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
+                                                        <h4 className="font-bold text-gray-900 dark:text-white text-lg sm:text-xl">{komplain.judul_komplain}</h4>
+                                                        <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
                                                             Kamar {komplain.kamar?.nomor_kamar} • {new Date(komplain.created_at).toLocaleDateString('id-ID')}
                                                         </p>
                                                     </div>
@@ -218,7 +238,7 @@ export default function Komplain({ komplains, kamarAktif }) {
                                                     {getTimeline(komplain.status)}
                                                 </div>
 
-                                                <div className="flex justify-between items-end mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+                                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mt-4 pt-4 border-t border-gray-100 dark:border-slate-700 gap-4 sm:gap-0">
                                                     {komplain.foto_kerusakan ? (
                                                         <a href={`/storage/${komplain.foto_kerusakan}`} target="_blank" rel="noreferrer" className="inline-flex items-center text-sm font-semibold text-amber-600 hover:text-amber-700">
                                                             <ImageIcon className="w-4 h-4 mr-1" /> Lihat Foto Lampiran
@@ -228,7 +248,7 @@ export default function Komplain({ komplains, kamarAktif }) {
                                                     {komplain.status === 'Selesai' && !komplain.rating && (
                                                         <button 
                                                             onClick={() => openRatingModal(komplain)}
-                                                            className="bg-[#8B5E3C] hover:bg-[#724a2e] text-white px-4 py-2 rounded-lg font-bold text-sm shadow-sm transition flex items-center"
+                                                            className="w-full sm:w-auto justify-center bg-[#8B5E3C] hover:bg-[#724a2e] text-white px-4 py-2 rounded-xl font-bold text-sm shadow-sm transition-all active:scale-95 flex items-center"
                                                         >
                                                             <Star className="w-4 h-4 mr-2" /> Beri Penilaian
                                                         </button>
@@ -236,10 +256,10 @@ export default function Komplain({ komplains, kamarAktif }) {
 
                                                     {komplain.rating && (
                                                         <div className="flex items-center bg-yellow-50 dark:bg-yellow-900/20 px-3 py-1.5 rounded-lg border border-yellow-200 dark:border-yellow-900/50">
-                                                            <span className="text-sm font-bold text-yellow-700 dark:text-yellow-500 mr-2">Dinilai:</span>
+                                                            <span className="text-xs sm:text-sm font-bold text-yellow-700 dark:text-yellow-500 mr-2">Dinilai:</span>
                                                             <div className="flex">
                                                                 {[...Array(5)].map((_, i) => (
-                                                                    <Star key={i} className={`w-4 h-4 ${i < komplain.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 dark:text-slate-600'}`} />
+                                                                    <Star key={i} className={`w-3 h-3 sm:w-4 sm:h-4 ${i < komplain.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 dark:text-slate-600'}`} />
                                                                 ))}
                                                             </div>
                                                         </div>
@@ -251,7 +271,7 @@ export default function Komplain({ komplains, kamarAktif }) {
                                 ) : (
                                     <div className="text-center py-10">
                                         <Wrench className="w-12 h-12 text-gray-300 dark:text-slate-600 mx-auto mb-3" />
-                                        <h4 className="text-gray-500 font-medium">Belum ada riwayat laporan kerusakan.</h4>
+                                        <h4 className="text-gray-500 font-medium text-sm sm:text-base">Belum ada riwayat laporan kerusakan.</h4>
                                     </div>
                                 )}
                             </div>
@@ -264,28 +284,28 @@ export default function Komplain({ komplains, kamarAktif }) {
             {ratingModalOpen && selectedKomplain && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={() => setRatingModalOpen(false)}></div>
-                    <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-md relative z-10 shadow-2xl p-6">
+                    <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-md relative z-10 shadow-2xl p-5 sm:p-6 mx-2">
                         <div className="flex justify-between items-center mb-5">
-                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">Nilai Hasil Perbaikan</h3>
-                            <button onClick={() => setRatingModalOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                <X className="w-6 h-6" />
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Nilai Hasil Perbaikan</h3>
+                            <button onClick={() => setRatingModalOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 active:scale-95 transition-transform">
+                                <X className="w-5 h-5 sm:w-6 sm:h-6" />
                             </button>
                         </div>
                         
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
                             Laporan <span className="font-bold">"{selectedKomplain.judul_komplain}"</span> telah diselesaikan. Seberapa puas Anda dengan hasil perbaikannya?
                         </p>
 
                         <form onSubmit={submitRating}>
-                            <div className="flex justify-center gap-2 mb-6">
+                            <div className="flex justify-center gap-2 sm:gap-3 mb-6">
                                 {[1, 2, 3, 4, 5].map(num => (
                                     <button
                                         type="button"
                                         key={num}
                                         onClick={() => ratingForm.setData('rating', num)}
-                                        className="focus:outline-none transition-transform hover:scale-110"
+                                        className="focus:outline-none transition-transform active:scale-90 hover:scale-110"
                                     >
-                                        <Star className={`w-10 h-10 ${ratingForm.data.rating >= num ? 'text-yellow-400 fill-yellow-400 drop-shadow-sm' : 'text-gray-300 dark:text-slate-600'}`} />
+                                        <Star className={`w-8 h-8 sm:w-10 sm:h-10 ${ratingForm.data.rating >= num ? 'text-yellow-400 fill-yellow-400 drop-shadow-sm' : 'text-gray-300 dark:text-slate-600'}`} />
                                     </button>
                                 ))}
                             </div>
@@ -293,7 +313,7 @@ export default function Komplain({ komplains, kamarAktif }) {
                             <div className="mb-6">
                                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Ulasan (Opsional)</label>
                                 <textarea
-                                    className="w-full rounded-xl border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-amber-500"
+                                    className="w-full rounded-xl border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 text-gray-900 dark:text-white focus:ring-amber-500 sm:text-sm"
                                     rows="3"
                                     placeholder="Tuliskan ulasan Anda mengenai perbaikan ini..."
                                     value={ratingForm.data.ulasan_penyewa}
@@ -304,7 +324,7 @@ export default function Komplain({ komplains, kamarAktif }) {
                             <button
                                 type="submit"
                                 disabled={ratingForm.processing}
-                                className="w-full bg-[#8B5E3C] hover:bg-[#724a2e] text-white font-bold py-3 rounded-xl transition shadow-md disabled:opacity-50"
+                                className="w-full bg-[#8B5E3C] hover:bg-[#724a2e] text-white font-bold py-3 rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50"
                             >
                                 {ratingForm.processing ? 'Menyimpan...' : 'Kirim Penilaian'}
                             </button>

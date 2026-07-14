@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Wrench, CheckCircle2, Clock, PlayCircle, Eye, AlertCircle } from 'lucide-react';
@@ -7,6 +7,26 @@ export default function Komplain({ komplains }) {
     const { flash } = usePage().props;
     const { put, processing } = useForm();
     const [selectedImage, setSelectedImage] = useState(null);
+    const [localKomplains, setLocalKomplains] = useState(komplains);
+
+    useEffect(() => {
+        setLocalKomplains(komplains);
+    }, [komplains]);
+
+    useEffect(() => {
+        if (window.Echo) {
+            window.Echo.channel('chat')
+                .listen('MessageSent', (e) => {
+                    setLocalKomplains((prev) => {
+                        const exists = prev.find(k => k.id === e.message.id);
+                        if (exists) {
+                            return prev.map(k => k.id === e.message.id ? {...k, ...e.message} : k);
+                        }
+                        return [e.message, ...prev];
+                    });
+                });
+        }
+    }, []);
 
     const updateStatus = (id, newStatus) => {
         put(route('admin.komplain.updateStatus', id), {
@@ -81,8 +101,8 @@ export default function Komplain({ komplains }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {komplains.length > 0 ? (
-                                    komplains.map((komplain) => (
+                                {localKomplains.length > 0 ? (
+                                    localKomplains.map((komplain) => (
                                         <tr key={komplain.id} className="border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {new Date(komplain.created_at).toLocaleDateString('id-ID', {

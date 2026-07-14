@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
+import ImageCropper from '@/Components/ImageCropper';
 
 export default function Profile({ auth, status }) {
     const user = auth.user;
@@ -30,12 +31,28 @@ export default function Profile({ auth, status }) {
         user.foto_profil ? `/storage/${user.foto_profil}` : null
     );
 
+    const [cropperImage, setCropperImage] = useState(null);
+    const [showCropper, setShowCropper] = useState(false);
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setProfileData('foto_profil', file);
-            setPreviewProfil(URL.createObjectURL(file));
+            setCropperImage(URL.createObjectURL(file));
+            setShowCropper(true);
         }
+        e.target.value = '';
+    };
+
+    const handleCropDone = ({ file, url }) => {
+        setProfileData('foto_profil', file);
+        setPreviewProfil(url);
+        setShowCropper(false);
+        setCropperImage(null);
+    };
+
+    const handleCropCancel = () => {
+        setShowCropper(false);
+        setCropperImage(null);
     };
 
     const { 
@@ -76,6 +93,16 @@ export default function Profile({ auth, status }) {
     return (
         <AdminLayout>
             <Head title="Pengaturan Akun" />
+
+            {showCropper && cropperImage && (
+                <ImageCropper
+                    imageSrc={cropperImage}
+                    onCropDone={handleCropDone}
+                    onCancel={handleCropCancel}
+                    aspectRatio={1}
+                    cropShape="round"
+                />
+            )}
 
             <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
                 {/* Header */}

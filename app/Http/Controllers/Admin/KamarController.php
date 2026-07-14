@@ -37,7 +37,6 @@ class KamarController extends Controller
             'status' => 'required|string|max:20',
             'fasilitas' => 'nullable|string',
             'deskripsi' => 'nullable|string',
-            'link_maps' => 'nullable|string',
             'galeri_foto.*' => 'nullable|image|max:2048',
         ]);
 
@@ -78,7 +77,6 @@ class KamarController extends Controller
             'status' => 'required|string|max:20',
             'fasilitas' => 'nullable|string',
             'deskripsi' => 'nullable|string',
-            'link_maps' => 'nullable|string',
             'galeri_foto.*' => 'nullable|image|max:2048',
         ]);
 

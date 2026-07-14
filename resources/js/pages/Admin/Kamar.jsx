@@ -19,7 +19,6 @@ export default function Kamar({ kamars = [] }) {
         harga: 500000,
         status: 'kosong',
         deskripsi: '',
-        link_maps: '',
         galeri_foto: [],
         _method: 'post',
     });
@@ -50,7 +49,6 @@ export default function Kamar({ kamars = [] }) {
             harga: kamar.harga,
             status: kamar.status,
             deskripsi: kamar.deskripsi || '',
-            link_maps: kamar.link_maps || '',
             galeri_foto: [],
             _method: 'put',
         });
@@ -239,26 +237,32 @@ export default function Kamar({ kamars = [] }) {
                                         </div>
 
                                         <div className="sm:col-span-2">
-                                            <label className="block text-sm font-semibold text-[#7D6B5D] dark:text-white mb-1">Deskripsi Kamar</label>
+                                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-1 gap-2">
+                                                <label className="block text-sm font-semibold text-[#7D6B5D] dark:text-white">Deskripsi & Fasilitas Kamar</label>
+                                                <div className="flex gap-2">
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={() => setData('deskripsi', 'Fasilitas Kamar: Kasur, Lemari Pakaian, Kipas Angin. Kamar Mandi Luar. Sudah termasuk listrik dan air.')}
+                                                        className="text-xs bg-[#E8E0D5] hover:bg-[#D3C6BC] dark:bg-slate-700 dark:hover:bg-slate-600 text-[#4A3B32] dark:text-white px-2 py-1 rounded transition-colors"
+                                                    >
+                                                        Template Standar
+                                                    </button>
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={() => setData('deskripsi', 'Fasilitas Kamar: Kasur Springbed, Lemari Pakaian, AC, Meja & Kursi, WiFi. Kamar Mandi Dalam (Kloset Duduk, Shower).')}
+                                                        className="text-xs bg-[#E8E0D5] hover:bg-[#D3C6BC] dark:bg-slate-700 dark:hover:bg-slate-600 text-[#4A3B32] dark:text-white px-2 py-1 rounded transition-colors"
+                                                    >
+                                                        Template VIP
+                                                    </button>
+                                                </div>
+                                            </div>
                                             <textarea
-                                                rows="3" placeholder="Fasilitas, keunggulan kamar..."
+                                                rows="3" placeholder="Isi fasilitas dan keunggulan kamar..."
                                                 className={`w-full bg-[#FAF6F0] dark:bg-slate-700 border ${errors.deskripsi ? 'border-red-500 focus:ring-red-500 shadow-sm' : 'border-[#E8E0D5] dark:border-slate-700 focus:ring-[#8B5E3C]'} text-[#4A3B32] dark:text-white rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2`}
                                                 value={data.deskripsi} onChange={e => setData('deskripsi', e.target.value)}
                                             ></textarea>
                                             {errors.deskripsi && (
                                                 <span className="text-red-500 text-xs mt-1 block font-medium">{errors.deskripsi}</span>
-                                            )}
-                                        </div>
-
-                                        <div className="sm:col-span-2">
-                                            <label className="block text-sm font-semibold text-[#7D6B5D] dark:text-white mb-1">Link Embed Maps (Opsional)</label>
-                                            <input
-                                                type="text" placeholder="<iframe src=..."
-                                                className={`w-full bg-[#FAF6F0] dark:bg-slate-700 border ${errors.link_maps ? 'border-red-500 focus:ring-red-500 shadow-sm' : 'border-[#E8E0D5] dark:border-slate-700 focus:ring-[#8B5E3C]'} text-[#4A3B32] dark:text-white rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2`}
-                                                value={data.link_maps} onChange={e => setData('link_maps', e.target.value)}
-                                            />
-                                            {errors.link_maps && (
-                                                <span className="text-red-500 text-xs mt-1 block font-medium">{errors.link_maps}</span>
                                             )}
                                         </div>
 

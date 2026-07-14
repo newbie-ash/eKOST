@@ -57,6 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Pembayaran Midtrans
         Route::post('/tagihan/{tagihan}/snap-token', [PaymentController::class, 'getSnapToken'])->name('payment.snap-token');
         Route::post('/tagihan/{tagihan}/simulate-success', [PaymentController::class, 'simulateSuccess'])->name('payment.simulate-success');
+        Route::post('/tagihan/{tagihan}/cancel-payment', [PaymentController::class, 'cancelPayment'])->name('payment.cancel');
 
         // Komplain
         Route::get('/user/komplain', [KomplainController::class, 'index'])->name('user.komplain.index');

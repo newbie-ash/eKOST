@@ -159,18 +159,17 @@ export default function Welcome({ auth, kamars }) {
                                                 </div>
 
                                                 <div className="space-y-2 mb-6 flex-1">
-                                                    <div className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                        <CheckCircle2 className="w-4 h-4 mr-2 text-green-600 dark:text-green-400" />
-                                                        Kamar Mandi Dalam
-                                                    </div>
-                                                    <div className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                        <CheckCircle2 className="w-4 h-4 mr-2 text-green-600 dark:text-green-400" />
-                                                        AC & Lemari
-                                                    </div>
-                                                    <div className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                        <CheckCircle2 className="w-4 h-4 mr-2 text-green-600 dark:text-green-400" />
-                                                        Kasur Springbed
-                                                    </div>
+                                                    {(kamar.fasilitas 
+                                                        ? kamar.fasilitas 
+                                                        : (kamar.tipe_kamar?.toLowerCase() === 'vip' 
+                                                            ? 'Kamar Mandi Dalam, AC & Lemari, Kasur Springbed' 
+                                                            : 'Kamar Mandi Luar, Kipas Angin, Kasur & Lemari')
+                                                    ).split(',').slice(0, 3).map((item, index) => (
+                                                        <div key={index} className="flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                                            <CheckCircle2 className="w-4 h-4 mr-2 text-green-600 dark:text-green-400 shrink-0" />
+                                                            <span className="truncate">{item.trim()}</span>
+                                                        </div>
+                                                    ))}
                                                 </div>
 
                                                 <div className="pt-4 border-t border-gray-200/50 dark:border-slate-700/50 mt-auto">
@@ -208,8 +207,8 @@ export default function Welcome({ auth, kamars }) {
                                 <div className="h-[400px] w-full rounded-2xl overflow-hidden z-10 relative">
                                     <MapContainer center={[5.1843, 97.1084]} zoom={15} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
                                         <TileLayer
-                                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                            attribution='Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics'
+                                            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                                         />
                                         <Marker position={[5.1843, 97.1084]}>
                                             <Popup>

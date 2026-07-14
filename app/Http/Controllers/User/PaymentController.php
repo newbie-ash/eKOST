@@ -33,11 +33,18 @@ class PaymentController extends Controller
             return response()->json(['error' => 'Tagihan sudah lunas']);
         }
 
-        if ($tagihan->snap_token) {
+        // Jika sudah ada snap_token, coba gunakan yang lama dulu
+        // Jika expired, frontend akan memanggil ulang dengan force_new=true
+        if ($tagihan->snap_token && !request()->boolean('force_new')) {
             return response()->json(['snap_token' => $tagihan->snap_token]);
         }
 
-        // Buat params untuk Midtrans
+        // Reset snap_token lama (expired/cancelled), buat yang baru
+        return $this->createNewSnapToken($tagihan);
+    }
+
+    private function createNewSnapToken(Tagihan $tagihan)
+    {
         $params = [
             'transaction_details' => [
                 'order_id' => 'INV-'.$tagihan->id.'-'.time(),
@@ -51,7 +58,6 @@ class PaymentController extends Controller
         ];
 
         // Bypass SSL error di localhost (Laragon/XAMPP)
-        // Mencegah bug Midtrans SDK saat merge array header
         Config::$curlOptions = [
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSL_VERIFYPEER => 0,
@@ -68,6 +74,24 @@ class PaymentController extends Controller
 
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function cancelPayment(Tagihan $tagihan)
+    {
+        // Security Check: IDOR Protection
+        $penyewa = Penyewa::where('user_id', auth()->id())->first();
+        if (! $penyewa || $tagihan->sewa->penyewa_id !== $penyewa->id) {
+            return response()->json(['error' => 'Unauthorized action.'], 403);
+        }
+
+        if ($tagihan->status_lunas) {
+            return response()->json(['error' => 'Tagihan sudah lunas, tidak bisa dibatalkan.']);
+        }
+
+        // Reset snap_token agar bisa membuat transaksi baru
+        $tagihan->update(['snap_token' => null]);
+
+        return redirect()->back()->with('message', 'Pembayaran dibatalkan. Anda bisa memulai pembayaran baru kapan saja.');
     }
 
     // Hanya untuk simulasi sukses ketika presentasi/demo offline

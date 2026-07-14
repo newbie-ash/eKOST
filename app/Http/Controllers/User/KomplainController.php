@@ -66,6 +66,9 @@ class KomplainController extends Controller
             'status' => 'Menunggu',
         ]);
 
+        $komplain->load(['penyewa.user', 'kamar']);
+        event(new \App\Events\MessageSent($komplain));
+
         return redirect()->back()->with('success', 'Laporan kerusakan berhasil dikirim.');
     }
 

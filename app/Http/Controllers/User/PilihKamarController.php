@@ -69,7 +69,7 @@ class PilihKamarController extends Controller
         $tanggalKeluar = Carbon::parse($request->tanggal_masuk)->addMonths((int) $request->durasi_bulan);
 
         // Buat pengajuan sewa
-        Sewa::create([
+        $sewa = Sewa::create([
             'kamar_id' => $kamar->id,
             'penyewa_id' => $penyewa->id,
             'tanggal_masuk' => $request->tanggal_masuk,
@@ -80,6 +80,9 @@ class PilihKamarController extends Controller
 
         // Ubah status kamar menjadi dibooking
         $kamar->update(['status' => 'dibooking']);
+
+        $sewa->load(['penyewa.user', 'kamar']);
+        event(new \App\Events\SewaCreated($sewa));
 
         return redirect()->route('tagihan-saya.index')->with('success', 'Pengajuan sewa berhasil dikirim. Silakan tunggu konfirmasi Admin.');
     }

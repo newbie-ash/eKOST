@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { User, Phone, Briefcase, FileText, Camera, Upload, CheckCircle2, UserCircle2, Shield } from 'lucide-react';
 import UserLayout from '@/Layouts/UserLayout';
+import ImageCropper from '@/Components/ImageCropper';
 import UpdatePasswordForm from '@/Pages/Profile/Partials/UpdatePasswordForm';
 
 export default function Profile() {
@@ -38,12 +39,28 @@ export default function Profile() {
         }
     };
 
+    const [cropperImage, setCropperImage] = useState(null);
+    const [showCropper, setShowCropper] = useState(false);
+
     const handleProfilChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setData('foto_profil', file);
-            setPreviewProfil(URL.createObjectURL(file));
+            setCropperImage(URL.createObjectURL(file));
+            setShowCropper(true);
         }
+        e.target.value = '';
+    };
+
+    const handleCropDone = ({ file, url }) => {
+        setData('foto_profil', file);
+        setPreviewProfil(url);
+        setShowCropper(false);
+        setCropperImage(null);
+    };
+
+    const handleCropCancel = () => {
+        setShowCropper(false);
+        setCropperImage(null);
     };
 
     const submit = (e) => {
@@ -58,6 +75,16 @@ export default function Profile() {
     return (
         <UserLayout>
             <Head title="Profil Saya" />
+
+            {showCropper && cropperImage && (
+                <ImageCropper
+                    imageSrc={cropperImage}
+                    onCropDone={handleCropDone}
+                    onCancel={handleCropCancel}
+                    aspectRatio={1}
+                    cropShape="round"
+                />
+            )}
 
             <div className="max-w-4xl mx-auto">
                 <div className="mb-6">

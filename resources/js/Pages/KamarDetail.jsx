@@ -148,15 +148,6 @@ export default function KamarDetail({ auth, kamar }) {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Map Lokasi */}
-                            {kamar.link_maps && (
-                                <div className="mt-auto">
-                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Peta Lokasi</h3>
-                                    <div className="aspect-video w-full rounded-2xl overflow-hidden bg-gray-200 dark:bg-slate-800 shadow-inner" dangerouslySetInnerHTML={{ __html: kamar.link_maps }}>
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>

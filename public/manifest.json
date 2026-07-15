@@ -1,0 +1,17 @@
+{
+  "name": "eKOS Premium Management",
+  "short_name": "eKOS",
+  "description": "Sistem Manajemen Kos Premium Lhokseumawe",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#8B5E3C",
+  "icons": [
+    {
+      "src": "/images/icon.svg",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

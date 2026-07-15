@@ -46,9 +46,9 @@ export default function Kamar({ kamars = [], summary }) {
                         <h3 className="text-sm font-medium text-orange-600 dark:text-orange-400 mb-1">Tersedia</h3>
                         <p className="text-2xl font-bold text-gray-900 dark:text-white">{summary.kosong} <span className="text-sm font-normal text-gray-400">Kamar</span></p>
                     </div>
-                    <div className="bg-indigo-50 dark:bg-indigo-900/20 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-800 shadow-sm">
-                        <h3 className="text-sm font-medium text-indigo-800 dark:text-indigo-300 mb-1">Potensi Omzet/Bln</h3>
-                        <p className="text-xl font-bold text-indigo-900 dark:text-indigo-200">{formatRupiah(summary.potensi_pendapatan)}</p>
+                    <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 sm:p-5 rounded-2xl border border-indigo-100 dark:border-indigo-800 shadow-sm">
+                        <h3 className="text-xs sm:text-sm font-medium text-indigo-800 dark:text-indigo-300 mb-1 leading-tight">Potensi Omzet</h3>
+                        <p className="text-base sm:text-xl font-bold text-indigo-900 dark:text-indigo-200 tracking-tight truncate">{formatRupiah(summary.potensi_pendapatan)}<span className="text-[10px] sm:text-sm font-normal text-indigo-600/70 dark:text-indigo-400/70 ml-1">/bln</span></p>
                     </div>
                 </div>
 
